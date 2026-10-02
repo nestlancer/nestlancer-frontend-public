@@ -18,7 +18,7 @@
   "dependencies": {
     "@nestlancer/config": "workspace:*",
     "@nestlancer/types": "workspace:*",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.4"
   },
   "peerDependencies": {
     "react": "^18.3.0"

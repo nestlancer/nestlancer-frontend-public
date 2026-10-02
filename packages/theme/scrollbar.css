@@ -1,0 +1,138 @@
+/**
+ * Modern element scrollbar styles — shared across Nestlancer apps.
+ * Targets overflow containers (sidebars, panels, lists), not the page root.
+ * Import after tokens.css: @import '@nestlancer/theme/scrollbar.css';
+ */
+
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto,
+.overflow-y-scroll,
+.overflow-x-scroll,
+.overflow-scroll,
+.scrollbar-modern {
+  scrollbar-gutter: auto;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--scrollbar-thumb) / var(--scrollbar-thumb-opacity)) transparent;
+}
+
+.overflow-y-auto:hover,
+.overflow-x-auto:hover,
+.overflow-auto:hover,
+.overflow-y-scroll:hover,
+.overflow-x-scroll:hover,
+.overflow-scroll:hover,
+.scrollbar-modern:hover {
+  scrollbar-color: hsl(var(--scrollbar-thumb-hover) / var(--scrollbar-thumb-hover-opacity))
+    transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar,
+.overflow-y-scroll::-webkit-scrollbar,
+.overflow-x-scroll::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar,
+.scrollbar-modern::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+.overflow-y-auto::-webkit-scrollbar-track,
+.overflow-x-auto::-webkit-scrollbar-track,
+.overflow-auto::-webkit-scrollbar-track,
+.overflow-y-scroll::-webkit-scrollbar-track,
+.overflow-x-scroll::-webkit-scrollbar-track,
+.overflow-scroll::-webkit-scrollbar-track,
+.scrollbar-modern::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb,
+.overflow-x-auto::-webkit-scrollbar-thumb,
+.overflow-auto::-webkit-scrollbar-thumb,
+.overflow-y-scroll::-webkit-scrollbar-thumb,
+.overflow-x-scroll::-webkit-scrollbar-thumb,
+.overflow-scroll::-webkit-scrollbar-thumb,
+.scrollbar-modern::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--scrollbar-thumb) / var(--scrollbar-thumb-opacity));
+  border: 1.5px solid transparent;
+  border-radius: var(--scrollbar-radius);
+  background-clip: padding-box;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.overflow-y-auto:hover::-webkit-scrollbar-thumb,
+.overflow-x-auto:hover::-webkit-scrollbar-thumb,
+.overflow-auto:hover::-webkit-scrollbar-thumb,
+.overflow-y-scroll:hover::-webkit-scrollbar-thumb,
+.overflow-x-scroll:hover::-webkit-scrollbar-thumb,
+.overflow-scroll:hover::-webkit-scrollbar-thumb,
+.scrollbar-modern:hover::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--scrollbar-thumb-hover) / var(--scrollbar-thumb-hover-opacity));
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.overflow-x-auto::-webkit-scrollbar-thumb:hover,
+.overflow-auto::-webkit-scrollbar-thumb:hover,
+.overflow-y-scroll::-webkit-scrollbar-thumb:hover,
+.overflow-x-scroll::-webkit-scrollbar-thumb:hover,
+.overflow-scroll::-webkit-scrollbar-thumb:hover,
+.scrollbar-modern::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--scrollbar-thumb-hover) / var(--scrollbar-thumb-hover-opacity));
+  border-color: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:active,
+.overflow-x-auto::-webkit-scrollbar-thumb:active,
+.overflow-auto::-webkit-scrollbar-thumb:active,
+.overflow-y-scroll::-webkit-scrollbar-thumb:active,
+.overflow-x-scroll::-webkit-scrollbar-thumb:active,
+.overflow-scroll::-webkit-scrollbar-thumb:active,
+.scrollbar-modern::-webkit-scrollbar-thumb:active {
+  background-color: hsl(var(--scrollbar-thumb-active) / var(--scrollbar-thumb-active-opacity));
+}
+
+.overflow-auto::-webkit-scrollbar-corner,
+.scrollbar-modern::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Hide scrollbar while preserving scroll (touch / trackpad / wheel) */
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Optional edge fade for horizontal pill / tab strips */
+.scroll-fade-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 1rem,
+    #000 calc(100% - 1rem),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 1rem,
+    #000 calc(100% - 1rem),
+    transparent
+  );
+}
+
+@media (min-width: 640px) {
+  .scroll-fade-x {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

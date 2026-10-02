@@ -1,0 +1,64 @@
+# =============================================================================
+# Private repo — commit config, env, and tooling needed to recover from GitHub.
+# DO NOT IGNORE (contract / codegen — must stay in git):
+#   swagger-docs/openapi-gateway.json
+#   packages/api-client/src/generated/
+#   orval.config.ts
+#   scripts/openapi/
+# TRACKED on purpose: .env*.example, .infisical.json, .npmrc, .cursor/, .vercel/
+# Real env files stay local. Examples stay in git.
+.env
+.env.*
+!.env.example
+!.env.*.example
+# =============================================================================
+
+# Dependencies (reinstall with pnpm install)
+node_modules/
+.pnpm-store/
+.pnp
+.pnp.js
+
+# Build outputs (regenerated)
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Turborepo cache
+.turbo/
+.cache/
+
+# Testing artifacts
+coverage/
+*.lcov
+playwright-report/
+test-results/
+
+# IDE — only machine-local junk; shared settings stay tracked
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and temp
+logs/
+.docker/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.temp/
+.tmp/
+tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Misc archives
+*.tgz

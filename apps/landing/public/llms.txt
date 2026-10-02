@@ -1,0 +1,36 @@
+# Nestlancer
+
+> Nestlancer — Your dedicated product studio.
+
+Nestlancer is a dedicated product studio for founders, startups, and product teams. Clients submit a brief, receive a milestone-based quote, pay on schedule via Razorpay, and track delivery in one workspace — from discovery through production handoff.
+
+## What Nestlancer does
+
+- Web application development (including MVP builds)
+- Mobile app development
+- UI/UX design and product design systems
+- Custom software and product engineering
+- Milestone-based billing with secure Razorpay payments (deposit / mid / final)
+
+## Target audience
+
+- Founders shipping a first product or MVP
+- Startups needing a dedicated studio (not a freelancer marketplace)
+- Product teams that want transparent quotes, milestones, and in-app collaboration
+
+## Key pages
+
+- [Home](https://nestlancer.com/): Studio overview and engagement model
+- [Services](https://nestlancer.com/services): Packages and deliverables
+- [Pricing](https://nestlancer.com/pricing): Transparent studio engagements (no SaaS subscription trap)
+- [About](https://nestlancer.com/about): Studio mission, workflow, and values
+- [Contact](https://nestlancer.com/contact): Project inquiries and partnerships (hello@nestlancer.com)
+
+## Client portal
+
+- Public portfolio and blog live on [app.nestlancer.com](https://app.nestlancer.com/)
+- Authenticated client workspace (requests, quotes, payments, messages) is private and not for indexing
+
+## Optional
+
+- [Full documentation for AI systems](https://nestlancer.com/llms-full.txt): Extended service breakdowns, milestones, workflows, tech stack, and contacts

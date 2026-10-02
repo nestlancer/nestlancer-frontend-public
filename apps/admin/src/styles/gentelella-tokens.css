@@ -1,0 +1,106 @@
+/**
+ * Gentelella v4 design tokens — admin console overrides.
+ * Ported from gentelella/src/scss/v4/_tokens.scss
+ */
+:root {
+  /* Darkened from #1abc9c → ≈#0c7a63 for WCAG AA on white (NL-BUG-A11Y-001) */
+  --accent-1: 168 82% 26%;
+  --accent-2: 168 70% 22%;
+
+  --background: 220 33% 97%;
+  --surface: 0 0% 100%;
+  --surface-muted: 210 20% 98%;
+  --sidebar: 216 32% 14%;
+  --foreground: 216 24% 16%;
+  --muted-foreground: 215 12% 38%;
+
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: var(--accent-1);
+  --primary: var(--accent-1);
+  --primary-foreground: 0 0% 100%;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --muted: var(--surface-muted);
+  --accent: var(--surface-muted);
+  --accent-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --secondary: 220 13% 91%;
+  --secondary-foreground: var(--foreground);
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --sidebar-width: 252px;
+  --sidebar-rail-width: 64px;
+  --header-height: 56px;
+  /* Admin console uses full fluid width; no center column cap */
+  --content-max-width: none;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius: var(--radius-md);
+
+  --ge-shadow-card: 0 1px 2px hsl(216 24% 16% / 0.06);
+  --ge-sidebar-bg: hsl(var(--surface));
+  --ge-sidebar-text: hsl(var(--muted-foreground));
+  --ge-sidebar-text-active: hsl(var(--foreground));
+  --ge-sidebar-active: hsl(var(--primary) / 0.1);
+  --ge-sidebar-border: hsl(var(--border));
+  --ge-sidebar-hover: hsl(var(--muted) / 0.65);
+  --ge-sidebar-section: hsl(var(--muted-foreground));
+  --ge-primary: hsl(var(--primary));
+  --status-info: 217 91% 60%;
+  --status-info-bg: 217 91% 60% / 0.1;
+  --status-success: 160 84% 39%;
+  --status-success-bg: 160 84% 39% / 0.1;
+  --status-warning: 38 92% 50%;
+  --status-warning-bg: 38 92% 50% / 0.1;
+  --status-error: 0 72% 51%;
+  --status-error-bg: 0 72% 51% / 0.1;
+  --status-purple: 262 83% 58%;
+  --status-purple-bg: 262 83% 58% / 0.1;
+
+  --ge-canvas: #f5f7fa;
+  --ge-chart-tab-shadow: 0 1px 2px hsl(216 24% 16% / 0.06);
+}
+
+.dark {
+  --background: 220 33% 8%;
+  --surface: 216 32% 14%;
+  --surface-muted: 216 28% 12%;
+  --sidebar: 216 32% 14%;
+  --foreground: 216 20% 93%;
+  --muted-foreground: 215 12% 62%;
+
+  --border: 216 20% 18%;
+  --input: 216 20% 18%;
+  --ring: var(--accent-1);
+  --primary: var(--accent-1);
+  --primary-foreground: 0 0% 100%;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --muted: var(--surface-muted);
+  --accent: 216 28% 16%;
+  --accent-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --secondary: 216 28% 16%;
+  --secondary-foreground: var(--foreground);
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --ge-shadow-card: 0 1px 3px hsl(0 0% 0% / 0.35);
+  --ge-sidebar-bg: #1a2332;
+  --ge-sidebar-text: #7b8fa3;
+  --ge-sidebar-text-active: #ffffff;
+  --ge-sidebar-active: rgba(14, 141, 114, 0.08);
+  --ge-sidebar-border: hsl(0 0% 100% / 0.08);
+  --ge-sidebar-hover: hsl(0 0% 100% / 0.05);
+  --ge-sidebar-section: #94a3b8;
+  --ge-canvas: hsl(var(--background));
+  --ge-chart-tab-shadow: 0 1px 3px hsl(0 0% 0% / 0.35);
+}

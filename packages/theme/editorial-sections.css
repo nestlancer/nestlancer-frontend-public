@@ -1,0 +1,72 @@
+/**
+ * Warm Editorial section patterns — public marketing surfaces.
+ * 70% neutrals / 30% teal accent (Verdigris, SoFi, Netlify editorial guidance).
+ * Accents are tints and labels — not full-saturation brand blocks.
+ *
+ * Plain CSS (no @layer) — imported before @tailwind in app globals.css.
+ */
+
+/* Logo / trust row — muted warm band */
+.trust-strip {
+  background-color: hsl(var(--trust-bg, var(--surface-muted)));
+  color: hsl(var(--trust-fg, var(--muted-foreground)));
+  border-top: 1px solid hsl(var(--border) / 0.65);
+  border-bottom: 1px solid hsl(var(--border) / 0.65);
+}
+
+/* Stats row — teal tint + neutral surface, numbers in brand teal */
+.stats-band {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--primary) / 0.05) 0%,
+    hsl(var(--surface-muted, var(--muted)) / 0.85) 100%
+  );
+  border-top: 1px solid hsl(var(--border) / 0.65);
+  border-bottom: 1px solid hsl(var(--border) / 0.65);
+  color: hsl(var(--foreground));
+}
+
+.stats-band__title {
+  color: hsl(var(--foreground));
+}
+
+.stats-band__value {
+  color: hsl(var(--primary));
+}
+
+.stats-band__label {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Subtle accent surface — newsletter, hire CTAs, tinted cards */
+.accent-surface {
+  border: 1px solid hsl(var(--primary) / 0.18);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.06) 0%,
+    hsl(var(--surface)) 55%,
+    hsl(var(--surface-muted, var(--muted)) / 0.5) 100%
+  );
+}
+
+/* CTA band — neutral surface, teal reserved for buttons */
+.cta-band {
+  position: relative;
+  overflow: hidden;
+  background-color: hsl(var(--surface));
+  border-top: 1px solid hsl(var(--border) / 0.65);
+  border-bottom: 1px solid hsl(var(--border) / 0.65);
+}
+
+.cta-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--primary) / 0.04) 0%,
+    transparent 45%,
+    transparent 100%
+  );
+  pointer-events: none;
+}

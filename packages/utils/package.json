@@ -1,0 +1,25 @@
+{
+  "name": "@nestlancer/utils",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./notifications": {
+      "types": "./src/notifications.ts",
+      "default": "./src/notifications.ts"
+    }
+  },
+  "scripts": {
+    "build": "echo '@nestlancer/utils: no emit'",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0"
+  }
+}

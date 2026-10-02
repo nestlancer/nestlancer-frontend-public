@@ -1,0 +1,117 @@
+{
+  "imageRegistry": "ghcr.io/nestlancer",
+  "k8sImageRegistryOverride": "ghcr.io/nestlancer",
+  "k8sDefaultImageTag": "latest",
+  "environments": {
+    "local": {
+      "namespace": "nestlancer-frontend-local",
+      "imageTag": "local",
+      "tls": false,
+      "certManagerIssuer": "",
+      "hosts": {
+        "frontend-web": "app.nestlancer.local",
+        "frontend-admin": "admin.nestlancer.local",
+        "frontend-landing": "www.nestlancer.local"
+      }
+    },
+    "dev": {
+      "namespace": "nestlancer-frontend-dev",
+      "imageTag": "dev",
+      "tls": true,
+      "certManagerIssuer": "letsencrypt-staging",
+      "hosts": {
+        "frontend-web": "dev-app.nestlancer.com",
+        "frontend-admin": "dev-admin.nestlancer.com",
+        "frontend-landing": "dev-landing.nestlancer.com"
+      }
+    },
+    "staging": {
+      "namespace": "nestlancer-frontend-staging",
+      "imageTag": "staging",
+      "tls": true,
+      "certManagerIssuer": "letsencrypt-staging",
+      "hosts": {
+        "frontend-web": "app-staging.nestlancer.com",
+        "frontend-admin": "admin-staging.nestlancer.com",
+        "frontend-landing": "www-staging.nestlancer.com"
+      }
+    },
+    "production": {
+      "namespace": "nestlancer-frontend",
+      "imageTag": "latest",
+      "tls": true,
+      "certManagerIssuer": "letsencrypt-prod",
+      "hosts": {
+        "frontend-web": "app.nestlancer.com",
+        "frontend-admin": "admin.nestlancer.com",
+        "frontend-landing": "landing.nestlancer.com"
+      }
+    }
+  },
+  "commonBuildArgs": {
+    "NEXT_PUBLIC_WS_URL": "https://api.nestlancer.com",
+    "NEXT_PUBLIC_SOCKET_IO_PATH": "/ws/socket.io",
+    "NEXT_PUBLIC_API_PROXY": "true",
+    "API_UPSTREAM": "https://api.nestlancer.com",
+    "NEXT_PUBLIC_APP_URL": "https://app.nestlancer.com",
+    "NEXT_PUBLIC_ADMIN_APP_URL": "https://admin.nestlancer.com",
+    "NEXT_PUBLIC_LANDING_URL": "https://nestlancer.com",
+    "NEXT_PUBLIC_AUTH_REFRESH_BFF": "true",
+    "NEXT_PUBLIC_RAZORPAY_KEY_ID": "",
+    "NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY": ""
+  },
+  "apps": [
+    {
+      "id": "frontend-web",
+      "composeService": "web",
+      "port": 9000,
+      "k8sName": "frontend-web",
+      "appFilter": "@nestlancer/web",
+      "ingressHost": "app.nestlancer.com",
+      "buildArgs": {
+        "NEXT_PUBLIC_API_URL": "https://app.nestlancer.com"
+      }
+    },
+    {
+      "id": "frontend-admin",
+      "composeService": "admin",
+      "port": 9010,
+      "k8sName": "frontend-admin",
+      "appFilter": "@nestlancer/admin",
+      "ingressHost": "admin.nestlancer.com",
+      "buildArgs": {
+        "NEXT_PUBLIC_API_URL": "https://admin.nestlancer.com"
+      }
+    },
+    {
+      "id": "frontend-landing",
+      "composeService": "landing",
+      "port": 9020,
+      "k8sName": "frontend-landing",
+      "appFilter": "@nestlancer/landing",
+      "ingressHost": "landing.nestlancer.com",
+      "buildArgs": {
+        "NEXT_PUBLIC_API_URL": "https://landing.nestlancer.com"
+      }
+    }
+  ],
+  "runtimeEnv": {
+    "web": {
+      "API_UPSTREAM": "http://host.docker.internal:4000",
+      "APP_ORIGIN": "https://app.nestlancer.com",
+      "LOG_LEVEL": "${LOG_LEVEL:-info}",
+      "NESTLANCER_SERVICE": "nl-prod-frontend-web"
+    },
+    "admin": {
+      "API_UPSTREAM": "http://host.docker.internal:4000",
+      "LOG_LEVEL": "${LOG_LEVEL:-info}",
+      "NESTLANCER_SERVICE": "nl-prod-frontend-admin"
+    },
+    "landing": {
+      "APP_ORIGIN": "https://app.nestlancer.com",
+      "API_UPSTREAM": "http://host.docker.internal:4000",
+      "LOG_LEVEL": "${LOG_LEVEL:-info}",
+      "NESTLANCER_SERVICE": "nl-prod-frontend-landing"
+    }
+  }
+}

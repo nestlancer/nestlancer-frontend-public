@@ -1,0 +1,21 @@
+{
+  "name": "@nestlancer/theme",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./motion.css": "./motion.css",
+    "./editorial-sections.css": "./editorial-sections.css",
+    "./scrollbar.css": "./scrollbar.css",
+    "./messaging.css": "./messaging.css",
+    "./forms.css": "./forms.css",
+    "./print.css": "./print.css"
+  },
+  "scripts": {
+    "build": "echo '@nestlancer/theme: no emit'",
+    "clean": "rm -rf dist .turbo"
+  }
+}

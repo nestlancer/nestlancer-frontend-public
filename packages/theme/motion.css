@@ -1,0 +1,347 @@
+.transition-theme {
+  transition:
+    background-color var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out);
+}
+
+/* CSP-safe public/marketing motion (no style attributes — NL-INFRA-001).
+   Delays via data-nl-delay; enter via .is-inview + keyframes. */
+.nl-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+  background: linear-gradient(90deg, hsl(var(--primary)), #fff);
+}
+
+.nl-motion {
+  --nl-d: 0ms;
+}
+
+.nl-motion[data-nl-delay='0'] {
+  --nl-d: 0ms;
+}
+.nl-motion[data-nl-delay='50'] {
+  --nl-d: 50ms;
+}
+.nl-motion[data-nl-delay='100'] {
+  --nl-d: 100ms;
+}
+.nl-motion[data-nl-delay='150'] {
+  --nl-d: 150ms;
+}
+.nl-motion[data-nl-delay='200'] {
+  --nl-d: 200ms;
+}
+.nl-motion[data-nl-delay='250'] {
+  --nl-d: 250ms;
+}
+.nl-motion[data-nl-delay='300'] {
+  --nl-d: 300ms;
+}
+.nl-motion[data-nl-delay='350'] {
+  --nl-d: 350ms;
+}
+.nl-motion[data-nl-delay='400'] {
+  --nl-d: 400ms;
+}
+.nl-motion[data-nl-delay='450'] {
+  --nl-d: 450ms;
+}
+.nl-motion[data-nl-delay='500'] {
+  --nl-d: 500ms;
+}
+.nl-motion[data-nl-delay='550'] {
+  --nl-d: 550ms;
+}
+.nl-motion[data-nl-delay='600'] {
+  --nl-d: 600ms;
+}
+.nl-motion[data-nl-delay='650'] {
+  --nl-d: 650ms;
+}
+.nl-motion[data-nl-delay='700'] {
+  --nl-d: 700ms;
+}
+.nl-motion[data-nl-delay='750'] {
+  --nl-d: 750ms;
+}
+.nl-motion[data-nl-delay='800'] {
+  --nl-d: 800ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes nl-reveal-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.75rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes nl-fade-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.25rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes nl-stage-left {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 2.5rem, 0) rotate(2deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes nl-stage-right {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 2.5rem, 0) rotate(-2deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes nl-zig-left {
+    from {
+      opacity: 0;
+      transform: translate3d(-1.5rem, 1rem, 0) rotate(-1.25deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes nl-zig-right {
+    from {
+      opacity: 0;
+      transform: translate3d(1.5rem, 1rem, 0) rotate(1.25deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes nl-soft-tilt {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.25rem, 0) rotateX(6deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes nl-kinetic-word {
+    from {
+      transform: translate3d(0, 110%, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  @keyframes nl-progress-fill {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .nl-reveal:not(.is-inview),
+  .nl-fade-up:not(.is-inview),
+  .nl-stage:not(.is-inview),
+  .nl-zig:not(.is-inview),
+  .nl-soft-tilt:not(.is-inview),
+  .nl-stagger-item:not(.is-inview) {
+    opacity: 0;
+  }
+
+  .nl-reveal.is-inview {
+    animation: nl-reveal-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-fade-up.is-inview {
+    animation: nl-fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-stage-left.is-inview {
+    animation: nl-stage-left 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-stage-right.is-inview {
+    animation: nl-stage-right 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-zig-left.is-inview {
+    animation: nl-zig-left 0.65s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-zig-right.is-inview {
+    animation: nl-zig-right 0.65s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-soft-tilt.is-inview {
+    animation: nl-soft-tilt 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-stagger-item.is-inview {
+    animation: nl-reveal-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-kinetic-word {
+    display: inline-block;
+    animation: nl-kinetic-word 0.75s cubic-bezier(0.16, 1, 0.3, 1) var(--nl-d, 0ms) both;
+  }
+
+  .nl-progress-fill-bar {
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+
+  .nl-progress-fill-bar.is-inview {
+    animation: nl-progress-fill 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nl-reveal,
+  .nl-fade-up,
+  .nl-stage,
+  .nl-zig,
+  .nl-soft-tilt,
+  .nl-stagger-item,
+  .nl-kinetic-word,
+  .nl-progress-fill-bar {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .nl-scroll-progress {
+    display: none;
+  }
+}
+
+.hero-mesh {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, hsl(var(--accent-1) / 0.25), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, hsl(var(--accent-2) / 0.15), transparent),
+    hsl(var(--background));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-scale-in,
+  .animate-in,
+  .animate-ping,
+  .hero-orbs::before,
+  .trust-marquee__track,
+  .work-marquee__track,
+  .chat-dock-pill.is-pulsing,
+  [class*='marquee'] {
+    animation: none !important;
+  }
+
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-scale-in,
+  .animate-in {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Public portfolio timeline — scroll-driven enter + spine fill.
+   Feature-detected: Firefox falls through to fully visible cards.
+   Opacity stays readable (A1: never gate content behind the reveal). */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes nl-ptl-enter {
+      from {
+        transform: translate3d(0, 1.15rem, 0);
+      }
+    }
+
+    @keyframes nl-ptl-fill {
+      from {
+        transform: scaleY(0);
+      }
+      to {
+        transform: scaleY(1);
+      }
+    }
+
+    .nl-ptl-card.nl-ptl-card--left,
+    .nl-ptl-card.nl-ptl-card--right {
+      animation: nl-ptl-enter auto linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 42%;
+    }
+
+    .nl-ptl-progress {
+      transform-origin: top center;
+      animation: nl-ptl-fill linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 88%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nl-ptl-card,
+  .nl-ptl-progress,
+  .nl-ptl-dot-pulse {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.nl-ptl-item[data-active] .nl-ptl-dot {
+  box-shadow: 0 0 0 6px hsl(var(--primary) / 0.12);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nl-ptl-item[data-active] .nl-ptl-dot-pulse {
+    animation: nl-ptl-node 1.8s ease-in-out infinite;
+  }
+
+  @keyframes nl-ptl-node {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.35);
+      opacity: 0.7;
+    }
+  }
+}

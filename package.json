@@ -1,0 +1,96 @@
+{
+  "name": "nestlancer-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\" --ignore-path .prettierignore",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "prepare": "husky",
+    "pull:openapi": "bash scripts/openapi/pull-openapi.sh",
+    "codegen": "orval --config orval.config.ts && node scripts/openapi/post-orval.mjs",
+    "api:drift-check:all": "node scripts/openapi/check-service-drift.mjs",
+    "openapi:lint": "pnpm exec spectral lint swagger-docs/openapi-gateway.json",
+    "contract:check": "pnpm codegen:check && pnpm openapi:lint",
+    "codegen:check": "pnpm codegen && git diff --exit-code packages/api-client/src/generated && pnpm api:drift-check:all",
+    "openapi:refresh": "pnpm pull:openapi && pnpm codegen",
+    "docker:build": "bash scripts/docker/compose-dev.sh build",
+    "docker:build:nocache": "bash scripts/docker/compose-dev.sh build --no-cache",
+    "docker:up": "bash scripts/docker/compose-dev.sh up -d",
+    "docker:up:letsencrypt": "bash scripts/docker/compose-dev.sh up -d",
+    "docker:up:watch-all": "bash scripts/docker/compose-dev.sh up -d",
+    "docker:down": "bash scripts/docker/compose-dev.sh down",
+    "docker:logs": "bash scripts/docker/compose-dev.sh logs -f --tail=100",
+    "docker:proxy:logs": "bash scripts/docker/compose-dev.sh logs -f --tail=100 dev-proxy",
+    "docker:logs:web": "bash scripts/docker/compose-dev.sh logs -f --tail=100 web",
+    "docker:logs:admin": "bash scripts/docker/compose-dev.sh logs -f --tail=100 admin",
+    "docker:logs:landing": "bash scripts/docker/compose-dev.sh logs -f --tail=100 landing",
+    "docker:verify:dev-host": "bash scripts/docker/verify-dev-host.sh",
+    "docker:ps": "bash scripts/docker/compose-dev.sh ps",
+    "docker:restart": "bash scripts/docker/compose-dev.sh restart",
+    "docker:start": "pnpm docker:build && pnpm docker:up",
+    "docker:prod:generate": "node scripts/docker/generate-prod-compose.mjs",
+    "docker:prod:build": "bash scripts/docker/build-all-prod-images.sh",
+    "docker:prod:build:one": "bash scripts/docker/build-prod-image.sh",
+    "docker:prod:build:group": "bash scripts/docker/build-group-prod-images.sh",
+    "docker:prod:pull": "bash scripts/docker/compose-prod.sh pull",
+    "docker:prod:up": "bash scripts/docker/compose-prod.sh up -d",
+    "docker:prod:down": "bash scripts/docker/compose-prod.sh down",
+    "docker:prod:ps": "bash scripts/docker/compose-prod.sh ps",
+    "docker:prod:logs": "bash scripts/docker/compose-prod.sh logs -f --tail=100",
+    "docker:prod:run": "pnpm docker:prod:up",
+    "docker:prod:start": "pnpm docker:prod:build && pnpm docker:prod:run",
+    "docker:prod:smoke": "bash scripts/deploy/smoke-health.sh",
+    "docker:prod:local:build": "bash scripts/docker/compose-prod-local.sh build",
+    "docker:prod:local:up": "bash scripts/docker/compose-prod-local.sh up -d",
+    "docker:prod:local:down": "bash scripts/docker/compose-prod-local.sh down",
+    "docker:prod:local:start": "pnpm docker:prod:local:build && pnpm docker:prod:local:up",
+    "k3s:generate": "node scripts/deploy/generate-k3s-manifests.mjs",
+    "k3s:validate": "bash scripts/deploy/k3s-validate.sh",
+    "k3s:local:test": "bash scripts/deploy/k3s-local-test.sh"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@types/node": "^20.17.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.0",
+    "@stoplight/spectral-cli": "^6.15.0",
+    "orval": "6.31.0",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1"
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "lint-staged": {
+    "!(packages/api-client/src/generated/**)*.{ts,tsx}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "!(swagger-docs/openapi-gateway.json)*.{json,md,css}": [
+      "prettier --write"
+    ]
+  }
+}

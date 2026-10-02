@@ -1,0 +1,9 @@
+node_modules
+.next
+dist
+.turbo
+pnpm-lock.yaml
+coverage
+
+# Gateway contract mirror: keep minified (matches backend export); avoid 20k-line prettier churn
+swagger-docs/openapi-gateway.json

@@ -1,0 +1,211 @@
+/**
+ * Nexus Fusion — scoped to public marketing pages only.
+ * Dashboard keeps TailAdmin blue (ta-brand-*).
+ * Dark = near-black + teal #2dd4bf; Light = cool paper + teal #0d9488.
+ */
+.public-editorial {
+  color-scheme: light;
+  accent-color: hsl(175 84% 26%);
+
+  /* Primary/meta darkened for WCAG AA (NL-BUG-A11Y-001) */
+  --accent-1: 175 84% 26%;
+  --accent-2: 173 60% 36%;
+  --background: 210 40% 98%;
+  --surface: 0 0% 100%;
+  --surface-muted: 210 30% 96%;
+  --foreground: 210 73% 15%;
+  --muted-foreground: 210 16% 36%;
+  --border: 214 20% 92%;
+  --input: 214 20% 92%;
+  --primary: 175 84% 26%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 175 84% 26%;
+  --brand-violet: 175 84% 26%;
+  --brand-coral: 16 55% 48%;
+  --trust-bg: 210 30% 96%;
+  --trust-fg: 210 16% 36%;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --muted: var(--surface-muted);
+  --secondary: 210 30% 96%;
+  --secondary-foreground: 210 73% 15%;
+  --accent: var(--surface-muted);
+  --accent-foreground: var(--foreground);
+
+  --article-bg: 210 40% 98%;
+  --article-text: 210 30% 22%;
+  --article-muted: 210 12% 36%;
+  --article-border: 214 20% 92%;
+  --article-accent: 175 84% 26%;
+  --article-meta: 210 10% 38%;
+  --article-chip-bg: 210 30% 96%;
+
+  --elevation-1: 0 0 0 1px hsl(214 20% 92%);
+  --elevation-2: 0 20px 50px hsl(210 73% 15% / 0.08);
+  --elevation-3: 0 8px 32px hsl(210 73% 15% / 0.1);
+  --elevation-4: 0 40px 100px hsl(210 73% 15% / 0.18);
+  --primary-dim: 175 84% 26% / 0.12;
+  --section-py: clamp(4.5rem, 10vw, 7.5rem);
+  --line-2: 214 18% 86%;
+
+  /* Remap ta-brand for any public components still referencing it */
+  --ta-brand-25: #f0fdfa;
+  --ta-brand-50: #ccfbf1;
+  --ta-brand-100: #99f6e4;
+  --ta-brand-500: #0d9488;
+  --ta-brand-600: #0f766e;
+  --ta-brand-700: #115e59;
+  --ta-brand-950: #042f2e;
+
+  font-family: var(--font-public-sans), var(--font-sans), system-ui, sans-serif;
+}
+
+.dark .public-editorial {
+  color-scheme: dark;
+  accent-color: hsl(173 67% 50%);
+
+  --accent-1: 173 67% 50%;
+  --accent-2: 173 55% 42%;
+  --background: 0 0% 2%;
+  --surface: 0 0% 5%;
+  --surface-muted: 0 0% 7%;
+  --foreground: 0 0% 93%;
+  --muted-foreground: 0 0% 54%;
+  --border: 0 0% 13%;
+  --input: 0 0% 28%;
+  --primary: 173 67% 50%;
+  --primary-foreground: 178 84% 10%;
+  --ring: 173 67% 50%;
+  --brand-violet: 173 67% 50%;
+  --brand-coral: 16 50% 52%;
+  --trust-bg: 0 0% 7%;
+  --trust-fg: 0 0% 54%;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --muted: var(--surface-muted);
+  --secondary: 0 0% 7%;
+  --secondary-foreground: 0 0% 93%;
+  --accent: var(--surface-muted);
+  --accent-foreground: var(--foreground);
+
+  --article-bg: 0 0% 2%;
+  --article-text: 0 0% 85%;
+  --article-muted: 0 0% 54%;
+  --article-border: 0 0% 13%;
+  --article-accent: 173 67% 50%;
+  --article-meta: 0 0% 54%;
+  --article-chip-bg: 0 0% 7%;
+
+  --elevation-1: 0 0 0 1px hsl(0 0% 13%), 0 0 0 1px hsl(0 0% 100% / 0.03);
+  --elevation-2: 0 20px 50px hsl(0 0% 0% / 0.45);
+  --elevation-3: 0 8px 32px hsl(0 0% 0% / 0.5);
+  --elevation-4: 0 40px 100px hsl(0 0% 0% / 0.6);
+  --primary-dim: 173 67% 50% / 0.12;
+  --line-2: 0 0% 18%;
+
+  --ta-brand-25: #042f2e;
+  --ta-brand-50: #0a2e28;
+  --ta-brand-100: #134e4a;
+  --ta-brand-500: #2dd4bf;
+  --ta-brand-600: #14b8a6;
+  --ta-brand-700: #0d9488;
+  --ta-brand-950: #042f2e;
+}
+
+.public-editorial .fig-label {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.public-editorial .fig-label::before {
+  content: '';
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+}
+
+.public-editorial .engineered-panel {
+  min-width: 0;
+  overflow-x: clip;
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem;
+  background: hsl(var(--surface));
+  box-shadow: var(--elevation-1);
+}
+
+.public-editorial .mesh-island {
+  color-scheme: light;
+  --background: 210 40% 98%;
+  --surface: 0 0% 100%;
+  --foreground: 210 73% 15%;
+  --muted-foreground: 210 16% 36%;
+  --border: 214 20% 92%;
+  --primary: 175 84% 26%;
+  --primary-foreground: 0 0% 100%;
+  color: hsl(210 73% 15%);
+  background:
+    radial-gradient(ellipse 70% 60% at 15% 0%, rgba(99, 91, 255, 0.2), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 90% 10%, rgba(13, 148, 136, 0.28), transparent 50%),
+    linear-gradient(180deg, #eef2ff 0%, #f6f9fc 55%, #e8f7f4 100%);
+}
+
+.public-editorial .kinetic-hl {
+  background: linear-gradient(120deg, hsl(var(--primary)), #99f6e4 40%, hsl(var(--foreground)) 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dark .public-editorial .kinetic-hl {
+  background: linear-gradient(120deg, hsl(var(--primary)), #a7f3d0 40%, #fff 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.public-editorial .trust-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.public-editorial .trust-marquee__track {
+  display: flex;
+  width: max-content;
+  gap: 2.75rem;
+  animation: public-trust-marquee 32s linear infinite;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  filter: grayscale(1);
+}
+
+@keyframes public-trust-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-editorial .trust-marquee__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+  }
+}

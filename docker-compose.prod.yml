@@ -1,0 +1,144 @@
+# AUTO-GENERATED — edit scripts/docker/workloads.manifest.json then:
+#   node scripts/docker/generate-prod-compose.mjs
+#
+# Production stack: pre-built GHCR images. Secrets via Infisical → .env.infisical
+#   bash scripts/docker/compose-prod.sh up -d
+#
+# Hard mem/CPU limits on every service (tuned for 8c/24GB VPS; was under-provisioned).
+#
+# Local build (no registry): pnpm docker:prod:build && pnpm docker:prod:up
+# Local build with Dockerfile context: pnpm docker:prod:local:start
+
+networks:
+  nestlancer-frontend-prod:
+    name: nestlancer-frontend-prod
+    driver: bridge
+
+services:
+  web:
+    image: ${NESTLANCER_IMAGE_REGISTRY:-ghcr.io/nestlancer}/frontend-web:${NESTLANCER_IMAGE_TAG:-latest}
+    container_name: nl-prod-frontend-web
+    env_file:
+      - .env.infisical
+    environment:
+      NODE_ENV: production
+      PORT: "9000"
+      NODE_OPTIONS: '--max-old-space-size=768'
+      API_UPSTREAM: "http://host.docker.internal:4000"
+      APP_ORIGIN: "https://app.nestlancer.com"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      NESTLANCER_SERVICE: "nl-prod-frontend-web"
+    ports:
+      - '9100:9000'
+    networks:
+      - nestlancer-frontend-prod
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    mem_limit: 1024m
+    memswap_limit: 1024m
+    cpus: 1.0
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/']
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+
+  admin:
+    image: ${NESTLANCER_IMAGE_REGISTRY:-ghcr.io/nestlancer}/frontend-admin:${NESTLANCER_IMAGE_TAG:-latest}
+    container_name: nl-prod-frontend-admin
+    env_file:
+      - .env.infisical
+    environment:
+      NODE_ENV: production
+      PORT: "9010"
+      NODE_OPTIONS: '--max-old-space-size=512'
+      API_UPSTREAM: "http://host.docker.internal:4000"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      NESTLANCER_SERVICE: "nl-prod-frontend-admin"
+    ports:
+      - '9110:9010'
+    networks:
+      - nestlancer-frontend-prod
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    mem_limit: 768m
+    memswap_limit: 768m
+    cpus: 0.75
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 768M
+        reservations:
+          cpus: '0.15'
+          memory: 192M
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9010/']
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+
+  landing:
+    image: ${NESTLANCER_IMAGE_REGISTRY:-ghcr.io/nestlancer}/frontend-landing:${NESTLANCER_IMAGE_TAG:-latest}
+    container_name: nl-prod-frontend-landing
+    env_file:
+      - .env.infisical
+    environment:
+      NODE_ENV: production
+      PORT: "9020"
+      NODE_OPTIONS: '--max-old-space-size=768'
+      APP_ORIGIN: "https://app.nestlancer.com"
+      API_UPSTREAM: "http://host.docker.internal:4000"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+      NESTLANCER_SERVICE: "nl-prod-frontend-landing"
+    ports:
+      - '9120:9020'
+    networks:
+      - nestlancer-frontend-prod
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    mem_limit: 1024m
+    memswap_limit: 1024m
+    cpus: 1.0
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9020/']
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5

@@ -1,0 +1,70 @@
+/**
+ * Print stylesheet — force paper-light output so dark mode does not print a black page.
+ * Imported last from each app globals.css so it wins over app .dark tokens.
+ */
+@media print {
+  html,
+  html.dark,
+  .dark,
+  body {
+    color-scheme: light !important;
+    background: #fff !important;
+    color: #111827 !important;
+    -webkit-print-color-adjust: economy;
+    print-color-adjust: economy;
+  }
+
+  html.dark,
+  .dark {
+    --background: 0 0% 100%;
+    --surface: 0 0% 100%;
+    --surface-muted: 210 40% 96%;
+    --sidebar: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --muted-foreground: 215 16% 35%;
+    --border: 214 32% 86%;
+    --input: 214 32% 86%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --glass-bg: 0 0% 100% / 1;
+    --glass-border: 222 47% 11% / 0.12;
+    --glass-shadow: none;
+    --article-bg: 0 0% 100%;
+    --article-text: 222 47% 11%;
+    --article-muted: 215 16% 35%;
+    --article-border: 214 32% 86%;
+    --article-chip-bg: 210 40% 96%;
+    --trust-bg: 0 0% 100%;
+    --trust-fg: 222 47% 11%;
+    --ge-sidebar-bg: #fff;
+    --ge-sidebar-text: #111827;
+    --ge-canvas: #fff;
+    --ta-panel-bg: #fff;
+    --ta-panel-border: #e5e7eb;
+    --ta-title: #111827;
+    --ta-body: #374151;
+  }
+
+  .ge-sidebar,
+  [data-sidebar],
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  table,
+  thead,
+  tr,
+  img,
+  .ge-card,
+  .avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

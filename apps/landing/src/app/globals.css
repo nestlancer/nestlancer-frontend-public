@@ -1,0 +1,401 @@
+@import '@nestlancer/theme/tokens.css';
+@import '@nestlancer/theme/motion.css';
+@import '@nestlancer/theme/editorial-sections.css';
+@import '@nestlancer/theme/scrollbar.css';
+@import '@nestlancer/theme/forms.css';
+@import '@nestlancer/theme/print.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Nexus Fusion — landing app tokens.
+ * Dark = near-black canvas + teal #2dd4bf.
+ * Light = cool paper #f6f9fc + teal #0d9488.
+ * Keeps ThemeToggle; money mesh islands force light via .mesh-island.
+ */
+@layer base {
+  :root {
+    color-scheme: light;
+    accent-color: hsl(175 84% 26%);
+
+    /* Light — cool paper; primary darkened for WCAG AA (NL-BUG-A11Y-001) */
+    --accent-1: 175 84% 26%;
+    --accent-2: 173 60% 36%;
+    --background: 210 40% 98%;
+    --surface: 0 0% 100%;
+    --surface-muted: 210 30% 96%;
+    --foreground: 210 73% 15%;
+    --muted-foreground: 210 16% 36%;
+    --border: 214 20% 92%;
+    --input: 214 20% 92%;
+    --primary: 175 84% 26%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 175 84% 26%;
+    --brand-violet: 175 84% 26%;
+    --brand-coral: 16 55% 48%;
+    --trust-bg: 210 30% 96%;
+    --trust-fg: 210 16% 40%;
+    --success: 152 60% 40%;
+    --warning: 38 92% 45%;
+    --danger: 0 72% 51%;
+
+    --card: var(--surface);
+    --card-foreground: var(--foreground);
+    --muted: var(--surface-muted);
+    --secondary: 210 30% 96%;
+    --secondary-foreground: 210 73% 15%;
+    --accent: var(--surface-muted);
+    --accent-foreground: var(--foreground);
+
+    --radius: 0.875rem;
+    --section-py: clamp(4.5rem, 10vw, 7.5rem);
+    --elevation-1: 0 0 0 1px hsl(214 20% 92%);
+    --elevation-2: 0 20px 50px hsl(210 73% 15% / 0.08);
+    --elevation-3: 0 8px 32px hsl(210 73% 15% / 0.1);
+    --elevation-4: 0 40px 100px hsl(210 73% 15% / 0.18);
+    --primary-dim: 175 84% 26% / 0.12;
+    --line-2: 214 18% 86%;
+  }
+
+  .dark {
+    color-scheme: dark;
+    accent-color: hsl(173 67% 50%);
+
+    /* Dark — Nexus near-black canvas */
+    --accent-1: 173 67% 50%;
+    --accent-2: 173 55% 42%;
+    --background: 0 0% 2%;
+    --surface: 0 0% 5%;
+    --surface-muted: 0 0% 7%;
+    --foreground: 0 0% 93%;
+    --muted-foreground: 0 0% 54%;
+    --border: 0 0% 13%;
+    --input: 0 0% 28%;
+    --primary: 173 67% 50%;
+    --primary-foreground: 178 84% 10%;
+    --ring: 173 67% 50%;
+    --brand-violet: 173 67% 50%;
+    --brand-coral: 16 50% 52%;
+    --trust-bg: 0 0% 7%;
+    --trust-fg: 0 0% 54%;
+    --success: 152 55% 48%;
+    --warning: 38 92% 55%;
+    --danger: 0 72% 60%;
+
+    --card: var(--surface);
+    --card-foreground: var(--foreground);
+    --muted: var(--surface-muted);
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 0 0% 93%;
+    --accent: var(--surface-muted);
+    --accent-foreground: var(--foreground);
+
+    --elevation-1: 0 0 0 1px hsl(0 0% 13%), 0 0 0 1px hsl(0 0% 100% / 0.03);
+    --elevation-2: 0 20px 50px hsl(0 0% 0% / 0.45);
+    --elevation-3: 0 8px 32px hsl(0 0% 0% / 0.5);
+    --elevation-4: 0 40px 100px hsl(0 0% 0% / 0.6);
+    --primary-dim: 173 67% 50% / 0.12;
+    --line-2: 0 0% 18%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .fig-label {
+    @apply mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground;
+  }
+
+  .fig-label::before {
+    content: '';
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 999px;
+    background: hsl(var(--primary));
+  }
+
+  .engineered-panel {
+    min-width: 0;
+    overflow-x: clip;
+    border: 1px solid hsl(var(--border));
+    border-radius: 1rem;
+    background: hsl(var(--surface));
+    box-shadow: var(--elevation-1);
+    transition:
+      transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 200ms,
+      box-shadow 250ms;
+  }
+
+  .engineered-panel-lift:hover {
+    transform: translateY(-3px);
+    border-color: hsl(var(--primary) / 0.35);
+    box-shadow: var(--elevation-2);
+  }
+
+  .engineered-panel-accent {
+    border-top: 2px solid hsl(var(--primary));
+  }
+
+  /* Stripe-style money island — always light, even under html.dark */
+  .mesh-island {
+    color-scheme: light;
+    --background: 210 40% 98%;
+    --surface: 0 0% 100%;
+    --foreground: 210 73% 15%;
+    --muted-foreground: 210 16% 40%;
+    --border: 214 20% 92%;
+    --primary: 175 84% 32%;
+    --primary-foreground: 0 0% 100%;
+    position: relative;
+    padding-block: var(--section-py);
+    color: hsl(210 73% 15%);
+    background:
+      radial-gradient(ellipse 70% 60% at 15% 0%, rgba(99, 91, 255, 0.2), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 90% 10%, rgba(13, 148, 136, 0.28), transparent 50%),
+      radial-gradient(ellipse 50% 40% at 50% 100%, rgba(244, 114, 182, 0.12), transparent 50%),
+      linear-gradient(180deg, #eef2ff 0%, #f6f9fc 55%, #e8f7f4 100%);
+  }
+
+  .hero-orbs {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-orbs::before {
+    content: '';
+    position: absolute;
+    inset: -10% -20% auto;
+    height: 70%;
+    pointer-events: none;
+    filter: blur(2px);
+    background:
+      radial-gradient(ellipse 50% 60% at 30% 40%, hsl(var(--primary) / 0.16), transparent 60%),
+      radial-gradient(ellipse 45% 50% at 75% 30%, hsl(217 91% 60% / 0.12), transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 80%, hsl(0 0% 100% / 0.04), transparent 50%);
+    animation: hero-orb-drift 18s ease-in-out infinite alternate;
+  }
+
+  @keyframes hero-orb-drift {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(3%, -4%, 0) scale(1.06);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-orbs::before {
+      animation: none;
+    }
+  }
+
+  .product-stage {
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    border-radius: 14px;
+    background: hsl(var(--surface));
+    box-shadow: var(--elevation-2);
+  }
+
+  .product-stage-chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(var(--surface-muted));
+    padding: 0.6rem 0.85rem;
+    font-size: 0.72rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .intake-badge {
+    @apply mb-4 inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold;
+    color: hsl(var(--success));
+    border-color: hsl(var(--success) / 0.3);
+    background: hsl(var(--success) / 0.08);
+  }
+}
+
+@layer utilities {
+  .warm-editorial {
+    position: relative;
+    overflow: hidden;
+    background-color: hsl(var(--background));
+  }
+
+  .warm-editorial::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 55%;
+    height: 80%;
+    background: radial-gradient(ellipse, hsl(var(--primary) / 0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .photo-hero {
+    background-color: #050505;
+  }
+
+  .photo-hero__image {
+    background-image: url('/marketing/about-hero.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    filter: saturate(0.55) brightness(0.45);
+  }
+
+  .photo-hero__gradient {
+    background: linear-gradient(
+      135deg,
+      rgba(5, 5, 5, 0.92) 0%,
+      rgba(13, 148, 136, 0.35) 50%,
+      rgba(5, 5, 5, 0.88) 100%
+    );
+  }
+
+  .photo-hero__vignette {
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(5, 5, 5, 0.55) 100%);
+  }
+
+  .section-py {
+    padding-block: var(--section-py);
+  }
+
+  .kinetic-hl {
+    background: linear-gradient(
+      120deg,
+      hsl(var(--primary)),
+      #a7f3d0 40%,
+      hsl(var(--foreground)) 70%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dark .kinetic-hl {
+    background: linear-gradient(120deg, hsl(var(--primary)), #a7f3d0 40%, #fff 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .trust-marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .trust-marquee__track {
+    display: flex;
+    width: max-content;
+    gap: 2.75rem;
+    animation: trust-marquee 32s linear infinite;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  @keyframes trust-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes work-marquee {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .work-marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .work-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: work-marquee 48s linear infinite;
+  }
+
+  .work-marquee__group {
+    display: flex;
+    gap: 1rem;
+    padding-right: 1rem;
+  }
+
+  .work-marquee:hover .work-marquee__track,
+  .work-marquee:focus-within .work-marquee__track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .work-marquee {
+      mask-image: none;
+      -webkit-mask-image: none;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+
+    .work-marquee__track {
+      animation: none;
+    }
+
+    .work-marquee__group:last-child {
+      display: none;
+    }
+
+    .work-marquee__group > a {
+      scroll-snap-align: start;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trust-marquee__track {
+      animation: none;
+      flex-wrap: wrap;
+      width: auto;
+      justify-content: center;
+    }
+
+    .intake-badge .animate-ping,
+    .animate-ping {
+      animation: none !important;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .engineered-panel,
+  .engineered-panel-lift:hover {
+    transition: none;
+    transform: none;
+  }
+
+  .hero-orbs::before {
+    animation: none;
+  }
+}

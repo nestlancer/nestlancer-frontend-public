@@ -1,0 +1,51 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: nestlancer-frontend-staging
+
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: Ingress
+      name: nestlancer-frontend
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: app-staging.nestlancer.com
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: app-staging.nestlancer.com
+  - target:
+      kind: Ingress
+      name: nestlancer-frontend
+    patch: |-
+      - op: replace
+        path: /spec/rules/1/host
+        value: admin-staging.nestlancer.com
+      - op: replace
+        path: /spec/tls/0/hosts/1
+        value: admin-staging.nestlancer.com
+  - target:
+      kind: Ingress
+      name: nestlancer-frontend
+    patch: |-
+      - op: replace
+        path: /spec/rules/2/host
+        value: www-staging.nestlancer.com
+      - op: replace
+        path: /spec/tls/0/hosts/2
+        value: www-staging.nestlancer.com
+
+# Image overrides (defaults to imageRegistry; set K8S_IMAGE_REGISTRY_OVERRIDE or k8sImageRegistryOverride to customize)
+images:
+  - name: ghcr.io/nestlancer/frontend-web
+    newName: ghcr.io/nestlancer/frontend-web
+    newTag: staging
+  - name: ghcr.io/nestlancer/frontend-admin
+    newName: ghcr.io/nestlancer/frontend-admin
+    newTag: staging
+  - name: ghcr.io/nestlancer/frontend-landing
+    newName: ghcr.io/nestlancer/frontend-landing
+    newTag: staging

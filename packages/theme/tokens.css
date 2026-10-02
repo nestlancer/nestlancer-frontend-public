@@ -1,0 +1,142 @@
+/**
+ * Nestlancer design tokens — single source of truth for all apps.
+ * Import in app globals.css: @import '@nestlancer/theme/tokens.css';
+ */
+:root {
+  color-scheme: light;
+  /* Darkened for WCAG AA text on white / muted surfaces (NL-BUG-A11Y-001) */
+  --accent-1: 250 100% 52%;
+  --accent-2: 280 100% 50%;
+
+  --background: 210 40% 98%;
+  --surface: 0 0% 100%;
+  --surface-muted: 210 40% 96%;
+  --sidebar: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --muted-foreground: 215 16% 38%;
+
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --primary: var(--accent-1);
+  --primary-foreground: 0 0% 100%;
+  --secondary: 214 32% 91%;
+  --secondary-foreground: 222 47% 11%;
+  --success: 160 84% 39%;
+  --warning: 38 92% 50%;
+  --danger: 0 84% 60%;
+  --brand-violet: var(--accent-1);
+  --brand-coral: 16 55% 48%;
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --muted: var(--surface-muted);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --accent: var(--surface-muted);
+  --accent-foreground: var(--foreground);
+  --destructive: var(--danger);
+  --destructive-foreground: 0 0% 100%;
+  --ring: var(--accent-1);
+
+  --status-success: 160 84% 39%;
+  --status-success-bg: 160 84% 39% / 0.12;
+  --status-success-border: 160 84% 39% / 0.3;
+  --status-warning: 38 92% 50%;
+  --status-warning-bg: 38 92% 50% / 0.12;
+  --status-warning-border: 38 92% 50% / 0.3;
+  --status-error: 0 84% 60%;
+  --status-error-bg: 0 84% 60% / 0.12;
+  --status-error-border: 0 84% 60% / 0.3;
+  --status-info: 200 98% 48%;
+  --status-info-bg: 200 98% 48% / 0.12;
+  --status-info-border: 200 98% 48% / 0.3;
+  --status-purple: 270 76% 53%;
+  --status-purple-bg: 270 76% 53% / 0.12;
+  --status-purple-border: 270 76% 53% / 0.3;
+  --status-neutral: 215 16% 47%;
+  --status-neutral-bg: 215 16% 47% / 0.12;
+  --status-neutral-border: 215 16% 47% / 0.3;
+
+  --glass-bg: 0 0% 100% / 0.72;
+  --glass-border: 222 47% 11% / 0.08;
+  --glass-blur: 20px;
+  --glass-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.08);
+
+  --sidebar-width: 260px;
+  --header-height: 64px;
+  --content-max-width: 1400px;
+  --content-narrow: 56rem;
+  --content-article: 45rem;
+
+  --trust-bg: 45 14% 95%;
+  --trust-fg: 30 5% 42%;
+
+  --article-bg: 60 9% 98%;
+  --article-text: 40 6% 22%;
+  --article-muted: 0 0% 42%;
+  --article-border: 40 6% 92%;
+  --article-accent: 211 79% 51%;
+  --article-meta: 40 2% 38%;
+  --article-chip-bg: 60 9% 96%;
+
+  --section-y-sm: 3rem;
+  --section-y-md: 4rem;
+  --section-y-lg: 5rem;
+  --section-y-xl: 6rem;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius: 0.875rem;
+
+  --duration-fast: 150ms;
+  --duration-normal: 280ms;
+  --duration-slow: 500ms;
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --scrollbar-size: 6px;
+  --scrollbar-radius: 9999px;
+  --scrollbar-thumb: 215 16% 47%;
+  --scrollbar-thumb-opacity: 0.28;
+  --scrollbar-thumb-hover: 215 16% 38%;
+  --scrollbar-thumb-hover-opacity: 0.55;
+  --scrollbar-thumb-active: 222 47% 11%;
+  --scrollbar-thumb-active-opacity: 0.72;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: 222 47% 6%;
+  --surface: 222 37% 10%;
+  --surface-muted: 222 37% 13%;
+  --sidebar: 222 41% 8%;
+  --foreground: 210 40% 96%;
+  --muted-foreground: 215 16% 68%;
+
+  --border: 222 20% 18%;
+  --input: 222 37% 12%;
+  --primary: var(--accent-1);
+  --primary-foreground: 222 47% 6%;
+  --secondary: 222 37% 15%;
+  --secondary-foreground: 210 40% 96%;
+
+  --glass-bg: 222 37% 12% / 0.6;
+  --glass-border: 210 40% 96% / 0.08;
+  --glass-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.3);
+
+  --article-bg: 0 0% 10%;
+  --article-text: 40 6% 89%;
+  --article-muted: 0 0% 65%;
+  --article-border: 0 0% 100% / 0.1;
+  --article-accent: 211 60% 62%;
+  --article-meta: 40 2% 68%;
+  --article-chip-bg: 0 0% 100% / 0.05;
+
+  --scrollbar-thumb: 215 16% 57%;
+  --scrollbar-thumb-opacity: 0.22;
+  --scrollbar-thumb-hover: 215 16% 70%;
+  --scrollbar-thumb-hover-opacity: 0.45;
+  --scrollbar-thumb-active: 210 40% 96%;
+  --scrollbar-thumb-active-opacity: 0.62;
+}

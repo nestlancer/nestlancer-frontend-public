@@ -1,0 +1,219 @@
+# Nestlancer frontend — Docker dev (Next.js, 8-core / 24GB VPS)
+# Env: .env.infisical (Infisical export via scripts/docker/compose-dev.sh) + per-service overrides.
+#
+#   • Resource ceilings    : every container has hard mem/CPU limits
+#   • Full app watch       : default WATCH_APPS=web,admin,landing (Next dev + HMR)
+#   • Native FS watch      : polling OFF by default (set WATCHPACK_POLLING=true if needed)
+#   • Batched bring-up     : compose-dev.sh starts all three apps concurrently
+#
+# Quick Start (8-core / 24GB VPS — SSH-safe):
+#   pnpm docker:build
+#   pnpm docker:up
+#   WATCH_APPS=web pnpm docker:up   # focused fallback
+#
+# Publishes :9000 (web) and :9010 (admin) and :9020 (landing) for nginx / Caddy.
+#
+# Stop: pnpm docker:down
+
+# ── Resource class templates (Compose v2 enforces deploy.resources + legacy keys) ──
+# Ceiling sized for next-dev; hybrid non-watch apps use far less at runtime.
+# All three share the same class so WATCH_APPS=web,admin does not OOM.
+# next-dev first compile needs ~2GB; next start (admin/landing) stays under ~512MB.
+x-limits-next-watch: &limits-next-watch
+  mem_limit: 3072m
+  memswap_limit: 3584m
+  cpus: 1.25
+  deploy:
+    resources:
+      limits:
+        cpus: '1.25'
+        memory: 3072M
+      reservations:
+        cpus: '0.20'
+        memory: 384M
+
+x-limits-next-start: &limits-next-start
+  mem_limit: 2048m
+  memswap_limit: 2304m
+  cpus: 0.75
+  deploy:
+    resources:
+      limits:
+        cpus: '0.75'
+        memory: 2048M
+      reservations:
+        cpus: '0.15'
+        memory: 256M
+
+# Admin watch/build class: first compile needs ~1.5–2GB heap.
+x-limits-next-build: &limits-next-build
+  mem_limit: 2816m
+  memswap_limit: 3072m
+  cpus: 1.00
+  deploy:
+    resources:
+      limits:
+        cpus: '1.00'
+        memory: 2816M
+      reservations:
+        cpus: '0.15'
+        memory: 256M
+
+# Named shared volumes: copy image node_modules once, reuse across containers.
+# Anonymous mounts re-copy GBs per container and thrash disk/CPU on small VPS.
+x-dev-volumes: &dev-volumes
+  - .:/app
+  - nl_fe_nm_root:/app/node_modules
+  - nl_fe_nm_web:/app/apps/web/node_modules
+  - nl_fe_next_web:/app/apps/web/.next
+  - nl_fe_nm_landing:/app/apps/landing/node_modules
+  - nl_fe_next_landing:/app/apps/landing/.next
+  - nl_fe_nm_admin:/app/apps/admin/node_modules
+  - nl_fe_next_admin:/app/apps/admin/.next
+  - nl_fe_nm_api_client:/app/packages/api-client/node_modules
+  - nl_fe_nm_auth:/app/packages/auth/node_modules
+  - nl_fe_nm_config:/app/packages/config/node_modules
+  - nl_fe_nm_constants:/app/packages/constants/node_modules
+  - nl_fe_nm_field_help:/app/packages/field-help/node_modules
+  - nl_fe_nm_hooks:/app/packages/hooks/node_modules
+  - nl_fe_nm_theme:/app/packages/theme/node_modules
+  - nl_fe_nm_types:/app/packages/types/node_modules
+  - nl_fe_nm_ui:/app/packages/ui/node_modules
+  - nl_fe_nm_utils:/app/packages/utils/node_modules
+  - nl_fe_nm_validators:/app/packages/validators/node_modules
+  - nl_fe_nm_websocket:/app/packages/websocket/node_modules
+
+x-dev-logging: &dev-logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+x-dev-service: &dev-service
+  image: nestlancer-frontend-dev:latest
+  pull_policy: never
+  build:
+    context: .
+    dockerfile: docker/dev.Dockerfile
+  env_file:
+    - .env.infisical
+  volumes: *dev-volumes
+  extra_hosts:
+    - 'host.docker.internal:host-gateway'
+  logging: *dev-logging
+  restart: unless-stopped
+  environment:
+    WATCH_APPS: '${WATCH_APPS:-web}'
+    # Polling OFF by default — inotify is enough on Linux VPS bind mounts.
+    WATCHPACK_POLLING: '${WATCHPACK_POLLING:-false}'
+    CHOKIDAR_USEPOLLING: '${CHOKIDAR_USEPOLLING:-false}'
+    WATCHPACK_POLLING_INTERVAL: '${WATCHPACK_POLLING_INTERVAL:-2000}'
+    NODE_OPTIONS: '--max-old-space-size=1792'
+
+volumes:
+  nl_fe_nm_root:
+  nl_fe_nm_web:
+  nl_fe_next_web:
+  nl_fe_nm_landing:
+  nl_fe_next_landing:
+  nl_fe_nm_admin:
+  nl_fe_next_admin:
+  nl_fe_nm_api_client:
+  nl_fe_nm_auth:
+  nl_fe_nm_config:
+  nl_fe_nm_constants:
+  nl_fe_nm_field_help:
+  nl_fe_nm_hooks:
+  nl_fe_nm_theme:
+  nl_fe_nm_types:
+  nl_fe_nm_ui:
+  nl_fe_nm_utils:
+  nl_fe_nm_validators:
+  nl_fe_nm_websocket:
+
+services:
+  web:
+    <<: [*limits-next-watch, *dev-service]
+    container_name: nestlancer-frontend-web-dev
+    environment:
+      WATCH_APPS: '${WATCH_APPS:-web}'
+      WATCHPACK_POLLING: '${WATCHPACK_POLLING:-false}'
+      CHOKIDAR_USEPOLLING: '${CHOKIDAR_USEPOLLING:-false}'
+      WATCHPACK_POLLING_INTERVAL: '${WATCHPACK_POLLING_INTERVAL:-2000}'
+      # Prevent next-dev cluster restarts that invalidate /_next/static chunk URLs (404 blank pages).
+      __NEXT_DISABLE_MEMORY_WATCHER: '${__NEXT_DISABLE_MEMORY_WATCHER:-1}'
+      NODE_OPTIONS_WATCH: '--max-old-space-size=2048'
+      NODE_OPTIONS: '--max-old-space-size=2048'
+      # Same-origin API: browser → /api/v1 → Next rewrites → API_UPSTREAM.
+      NEXT_PUBLIC_API_URL: https://dev-app.nestlancer.com
+      NEXT_PUBLIC_API_PROXY: 'true'
+      API_UPSTREAM: ${API_UPSTREAM:-https://dev-api.nestlancer.com}
+    ports:
+      - '9000:9000'
+    command: >
+      sh -c "cd /app && sh scripts/docker/run-next-workload.sh web @nestlancer/web 9000"
+    healthcheck:
+      test: ['CMD', 'curl', '-sf', 'http://127.0.0.1:9000/']
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 300s
+    networks:
+      - default
+      - nestlancer-dev
+
+  admin:
+    <<: [*limits-next-build, *dev-service]
+    container_name: nestlancer-frontend-admin-dev
+    environment:
+      WATCH_APPS: '${WATCH_APPS:-web}'
+      WATCHPACK_POLLING: '${WATCHPACK_POLLING:-false}'
+      CHOKIDAR_USEPOLLING: '${CHOKIDAR_USEPOLLING:-false}'
+      WATCHPACK_POLLING_INTERVAL: '${WATCHPACK_POLLING_INTERVAL:-2000}'
+      NODE_OPTIONS_WATCH: '--max-old-space-size=1792'
+      NODE_OPTIONS: '--max-old-space-size=1792'
+      NODE_OPTIONS_BUILD: '--max-old-space-size=2048'
+      NEXT_PUBLIC_API_URL: https://dev-admin.nestlancer.com
+      NEXT_PUBLIC_API_PROXY: 'true'
+      API_UPSTREAM: http://host.docker.internal:3000
+    ports:
+      - '9010:9010'
+    command: >
+      sh -c "cd /app && sh scripts/docker/run-next-workload.sh admin @nestlancer/admin 9010"
+    healthcheck:
+      test: ['CMD', 'curl', '-sf', 'http://127.0.0.1:9010/']
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 600s
+    networks:
+      - default
+      - nestlancer-dev
+
+  landing:
+    <<: [*limits-next-start, *dev-service]
+    container_name: nestlancer-frontend-landing-dev
+    environment:
+      WATCH_APPS: '${WATCH_APPS:-web}'
+      WATCHPACK_POLLING: '${WATCHPACK_POLLING:-false}'
+      CHOKIDAR_USEPOLLING: '${CHOKIDAR_USEPOLLING:-false}'
+      WATCHPACK_POLLING_INTERVAL: '${WATCHPACK_POLLING_INTERVAL:-2000}'
+      NODE_OPTIONS_WATCH: '--max-old-space-size=1792'
+      NODE_OPTIONS: '--max-old-space-size=1792'
+    ports:
+      - '9020:9020'
+    command: >
+      sh -c "cd /app && sh scripts/docker/run-next-workload.sh landing @nestlancer/landing 9020"
+    healthcheck:
+      test: ['CMD', 'curl', '-sf', 'http://127.0.0.1:9020/']
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 600s
+    networks:
+      - default
+      - nestlancer-dev
+
+networks:
+  nestlancer-dev:
+    external: true

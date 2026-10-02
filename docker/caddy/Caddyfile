@@ -1,0 +1,15 @@
+{
+  email {$LETSENCRYPT_EMAIL}
+}
+
+{$DEV_WEB_HOST} {
+  reverse_proxy web:9000
+}
+
+{$DEV_ADMIN_HOST} {
+  reverse_proxy admin:9010
+}
+
+{$DEV_LANDING_HOST} {
+  reverse_proxy landing:9020
+}

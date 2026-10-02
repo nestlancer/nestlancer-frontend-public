@@ -1,0 +1,46 @@
+{
+  "name": "@nestlancer/ui",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./icons": {
+      "types": "./src/icons/index.tsx",
+      "default": "./src/icons/index.tsx"
+    },
+    "./notifications": {
+      "types": "./src/utils/notification-registry.tsx",
+      "default": "./src/utils/notification-registry.tsx"
+    },
+    "./brand": {
+      "types": "./src/components/brand/index.ts",
+      "default": "./src/components/brand/index.ts"
+    },
+    "./messaging": {
+      "types": "./src/components/messaging/index.ts",
+      "default": "./src/components/messaging/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "echo '@nestlancer/ui: no emit'",
+    "lint": "eslint src --ext .ts,.tsx",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.6.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
+  }
+}

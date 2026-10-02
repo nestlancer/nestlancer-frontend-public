@@ -1,0 +1,8 @@
+extends:
+  - spectral:oas
+
+# Merged multi-service spec: many unused namespaced schemas and legacy path-param
+# naming across gateway vs microservice merges. Fail on errors except known merge noise.
+rules:
+  path-params: warn
+  oas3-unused-component: off

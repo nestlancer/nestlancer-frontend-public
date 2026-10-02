@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: nestlancer-frontend-local
+
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: Ingress
+      name: nestlancer-frontend
+    patch: |-
+      - op: replace
+        path: /metadata/annotations
+        value:
+          traefik.ingress.kubernetes.io/router.entrypoints: web
+      - op: remove
+        path: /spec/tls
+      - op: replace
+        path: /spec/rules/0/host
+        value: app.nestlancer.local
+      - op: replace
+        path: /spec/rules/1/host
+        value: admin.nestlancer.local
+      - op: replace
+        path: /spec/rules/2/host
+        value: www.nestlancer.local
+
+images:
+  - name: ghcr.io/nestlancer/frontend-web
+    newName: ghcr.io/nestlancer/frontend-web
+    newTag: local
+  - name: ghcr.io/nestlancer/frontend-admin
+    newName: ghcr.io/nestlancer/frontend-admin
+    newTag: local
+  - name: ghcr.io/nestlancer/frontend-landing
+    newName: ghcr.io/nestlancer/frontend-landing
+    newTag: local

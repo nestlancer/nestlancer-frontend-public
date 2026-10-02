@@ -1,0 +1,123 @@
+# Deploys the DEVELOPMENT frontend stack on the VPS (dev-web / dev-admin subdomains).
+# VPS: git pull → Infisical export (env=dev) → docker compose up.
+#
+# Infisical machine identity: github-actions-nestlancer-frontend-ui-dev
+# Project ID: 61ae088e-7cbb-47c5-9319-d1e0e2d8996f (.infisical.json)
+#
+# Required GitHub Secrets:
+#   VPS_HOST, VPS_USERNAME, VPS_PASSWORD
+#   INFISICAL_CLIENT_ID, INFISICAL_CLIENT_SECRET
+# Optional:
+#   VPS_FRONTEND_DEPLOY_PATH — default: /root/nestlancer-frontend
+#   INFISICAL_PROJECT_ID — override; default from .infisical.json on VPS
+
+name: Frontend CD (Dev)
+
+on:
+  workflow_run:
+    workflows: ['Frontend CI']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-dev-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Frontend (Dev)
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Deploy dev stack to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          envs: INFISICAL_CLIENT_ID,INFISICAL_CLIENT_SECRET
+          command_timeout: 30m
+          script: |
+            set -euo pipefail
+            DEPLOY_PATH="${{ secrets.VPS_FRONTEND_DEPLOY_PATH }}"
+            [ -z "$DEPLOY_PATH" ] && DEPLOY_PATH="/root/nestlancer-frontend"
+            if [ ! -d "$DEPLOY_PATH/.git" ]; then
+              echo "Deploy path missing — cloning into $DEPLOY_PATH"
+              mkdir -p "$(dirname "$DEPLOY_PATH")"
+              git clone git@github.com:nestlancer/nestlancer-frontend.git "$DEPLOY_PATH"
+            fi
+            cd "$DEPLOY_PATH"
+
+            PREV_SHA="$(git rev-parse HEAD)"
+            echo "$PREV_SHA" > .deploy-previous-sha
+
+            git pull origin main
+
+            rollback_on_fail() {
+              echo "Deploy failed — rolling back to ${PREV_SHA}"
+              git reset --hard "$PREV_SHA"
+              docker network create nestlancer-dev 2>/dev/null || true
+              docker compose -f docker-compose.dev.yml down --remove-orphans || true
+              docker compose -f docker-compose.dev.yml up -d || true
+              exit 1
+            }
+            trap rollback_on_fail ERR
+
+            if ! command -v infisical >/dev/null 2>&1; then
+              echo "ERROR: infisical CLI not installed on VPS"
+              exit 1
+            fi
+
+            export INFISICAL_TOKEN=$(infisical login \
+              --method=universal-auth \
+              --client-id="$INFISICAL_CLIENT_ID" \
+              --client-secret="$INFISICAL_CLIENT_SECRET" \
+              --silent --plain)
+
+            PROJECT_ID="${{ secrets.INFISICAL_PROJECT_ID }}"
+            [ -z "$PROJECT_ID" ] && [ -f .infisical.json ] && \
+              PROJECT_ID="$(node -p "JSON.parse(require('fs').readFileSync('.infisical.json','utf8')).workspaceId")"
+            if [ -z "$PROJECT_ID" ]; then
+              echo "ERROR: set INFISICAL_PROJECT_ID or commit .infisical.json on VPS" >&2
+              exit 1
+            fi
+            infisical export --env=dev --format=dotenv --projectId="$PROJECT_ID" > .env.infisical
+            chmod 600 .env.infisical
+
+            chmod +x scripts/deploy/k3s-deploy.sh
+
+            if [ "${{ vars.NESTLANCER_DEPLOY_MODE || 'k3s' }}" = "k3s" ] && command -v kubectl >/dev/null 2>&1; then
+              export NESTLANCER_IMAGE_REGISTRY="${{ secrets.NESTLANCER_IMAGE_REGISTRY }}"
+              export GHCR_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+              export GHCR_USERNAME="${{ github.actor }}"
+              ./scripts/deploy/k3s-deploy.sh dev
+            else
+              # Frontend joins the backend compose network (external: true).
+              docker network create nestlancer-dev 2>/dev/null || true
+              # Prior failed deploys can leave broken pnpm bind-volume symlinks.
+              docker compose -f docker-compose.dev.yml down --remove-orphans || true
+              docker volume ls -q | grep -E 'nestlancer-frontend_nl_fe_' | while read -r vol; do
+                docker volume rm "$vol" >/dev/null 2>&1 || true
+              done
+              docker compose -f docker-compose.dev.yml build
+              docker compose -f docker-compose.dev.yml up -d
+            fi
+
+            trap - ERR
+            echo "Frontend deploy succeeded at $(git rev-parse --short HEAD)"

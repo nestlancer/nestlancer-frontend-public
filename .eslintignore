@@ -1,0 +1,7 @@
+.next
+dist
+.turbo
+node_modules
+coverage
+pnpm-lock.yaml
+packages/api-client/src/generated

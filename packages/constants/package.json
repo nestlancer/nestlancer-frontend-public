@@ -1,0 +1,21 @@
+{
+  "name": "@nestlancer/constants",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@nestlancer/types": "workspace:*"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "echo '@nestlancer/constants: no emit'",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  }
+}

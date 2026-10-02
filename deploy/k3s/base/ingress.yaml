@@ -1,0 +1,48 @@
+# K3s default ingress: Traefik (installed with K3s).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nestlancer-frontend
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: app.nestlancer.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-web
+                port:
+                  number: 80
+    - host: admin.nestlancer.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-admin
+                port:
+                  number: 80
+    - host: www.nestlancer.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-landing
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - app.nestlancer.com
+        - admin.nestlancer.com
+        - www.nestlancer.com
+      secretName: nestlancer-frontend-tls

@@ -1,0 +1,26 @@
+/**
+ * Native <select> controls — keep the browser chevron clear of the label.
+ *
+ * Unlayered on purpose: this must beat Tailwind padding utilities (px-*, pr-*)
+ * so filter bars and one-off selects cannot regress into icon/text overlap.
+ */
+select:not([multiple]):not([size]) {
+  padding-inline-end: 2.5rem;
+}
+
+/** Compact selects (pagination, dense forms) — padding only. */
+.nl-select {
+  padding-inline-start: 0.625rem;
+  padding-inline-end: 2.5rem;
+}
+
+/**
+ * Filter-bar selects — floor width for labels like "All statuses",
+ * "Inbox (needs review)", "Converted to project". Long labels can still grow.
+ */
+.nl-select-filter,
+[role='search'] select:not([multiple]):not([size]) {
+  min-width: 13rem;
+  padding-inline-start: 0.625rem;
+  padding-inline-end: 2.5rem;
+}

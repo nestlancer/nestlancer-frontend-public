@@ -1,0 +1,41 @@
+{
+  "name": "@nestlancer/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./react-query": {
+      "types": "./src/generated/react-query/index.ts",
+      "default": "./src/generated/react-query/index.ts"
+    },
+    "./maintenance": {
+      "types": "./src/maintenance.ts",
+      "default": "./src/maintenance.ts"
+    }
+  },
+  "scripts": {
+    "build": "echo '@nestlancer/api-client: no emit'",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@nestlancer/auth": "workspace:*",
+    "@nestlancer/config": "workspace:*",
+    "@nestlancer/types": "workspace:*",
+    "@nestlancer/utils": "workspace:*",
+    "@tanstack/react-query": "^5.62.8",
+    "axios": "^1.7.9"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.62.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,122 @@
+# Validates the frontend monorepo on every PR/push to main.
+
+name: Frontend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  # next lint/build load next.config and @nestlancer/config env; runners use NODE_ENV=production
+  API_UPSTREAM: https://dev-api.nestlancer.com
+  NEXT_PUBLIC_API_URL: https://dev-api.nestlancer.com
+  NEXT_PUBLIC_APP_URL: https://dev-app.nestlancer.com
+  NEXT_PUBLIC_ADMIN_APP_URL: https://dev-admin.nestlancer.com
+  NEXT_PUBLIC_WS_URL: https://dev-api.nestlancer.com
+
+jobs:
+  validate-and-build:
+    name: Lint, Type-check, Build, Contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Dependency audit (production)
+        run: pnpm audit --prod --audit-level=high || true
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type Check
+        run: pnpm type-check
+
+      - name: Unit Tests
+        run: |
+          pnpm --filter @nestlancer/web test
+          pnpm --filter @nestlancer/api-client test
+          pnpm --filter @nestlancer/auth test
+          pnpm --filter @nestlancer/config test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Contract Check (OpenAPI lint + codegen drift)
+        run: pnpm contract:check
+
+  e2e-mocked:
+    name: Playwright (mocked)
+    runs-on: ubuntu-latest
+    needs: validate-and-build
+    # Same-origin API URL so browser calls hit 127.0.0.1 and Playwright can mock them
+    env:
+      API_UPSTREAM: http://127.0.0.1:9000
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:9000
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:9000
+      NEXT_PUBLIC_ADMIN_APP_URL: http://127.0.0.1:9000
+      NEXT_PUBLIC_WS_URL: http://127.0.0.1:9000
+      NEXT_PUBLIC_API_PROXY: 'false'
+      NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_e2e
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build Web App
+        run: pnpm --filter @nestlancer/web build
+
+      - name: Install Playwright Chromium
+        working-directory: apps/web
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Mocked E2E
+        working-directory: apps/web
+        env:
+          CI: 'true'
+          PLAYWRIGHT_SKIP_WEBSERVER: 'true'
+          PLAYWRIGHT_WEB_BASE_URL: 'http://127.0.0.1:9000'
+        run: |
+          pnpm start &
+          SERVER_PID=$!
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:9000 >/dev/null; then break; fi
+            sleep 2
+          done
+          pnpm exec playwright test \
+            tests/e2e/smoke.spec.ts \
+            tests/e2e/payment-checkout.mocked.spec.ts \
+            tests/e2e/requests-list.mocked.spec.ts
+          kill $SERVER_PID || true

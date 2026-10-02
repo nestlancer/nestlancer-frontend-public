@@ -1,0 +1,38 @@
+services:
+  # Sidecar reverse proxy — keep tiny so it cannot starve Next apps on 6c/12GB.
+  dev-proxy:
+    image: caddy:2.8-alpine
+    container_name: nl-frontend-dev-proxy
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.20
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 128M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+    depends_on:
+      - web
+      - admin
+      - landing
+    environment:
+      DEV_WEB_HOST: ${DEV_WEB_HOST:-dev-app.nestlancer.com}
+      DEV_ADMIN_HOST: ${DEV_ADMIN_HOST:-dev-admin.nestlancer.com}
+      DEV_LANDING_HOST: ${DEV_LANDING_HOST:-dev-landing.nestlancer.com}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-ops@nestlancer.com}
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./.docker/caddy/data:/data
+      - ./.docker/caddy/config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    restart: unless-stopped

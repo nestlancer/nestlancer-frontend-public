@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      nextjs:
+        patterns:
+          - 'next'
+          - '@next/*'
+      react-query:
+        patterns:
+          - '@tanstack/*'

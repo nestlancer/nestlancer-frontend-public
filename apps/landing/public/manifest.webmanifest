@@ -1,0 +1,19 @@
+{
+  "name": "Nestlancer",
+  "short_name": "Nestlancer",
+  "description": "Dedicated product studio — milestone quotes, scheduled payments, and client delivery in one workspace.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "lang": "en",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

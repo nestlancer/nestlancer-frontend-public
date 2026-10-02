@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-landing
+spec:
+  selector:
+    app: frontend-landing
+  ports:
+    - port: 80
+      targetPort: http
+      name: http

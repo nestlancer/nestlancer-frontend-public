@@ -1,0 +1,178 @@
+# Nestlancer frontend — production mode locally (build on machine, no GHCR).
+# Config: Infisical → .env.infisical via scripts/docker/compose-prod-local.sh
+#
+# Images are built by `pnpm docker:prod:local:build` (same tags as GHCR compose).
+# Do not keep a tagged monorepo-builder/cache image — BuildKit cache is internal.
+#
+#   pnpm docker:prod:local:start
+#   pnpm docker:prod:local:down
+#
+# Apps: http://localhost:9000 (web), :9010 (admin), :9020 (landing)
+
+x-limits-web: &limits-web
+  mem_limit: 1024m
+  memswap_limit: 1024m
+  cpus: 1.0
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 1024M
+      reservations:
+        cpus: '0.25'
+        memory: 256M
+
+x-limits-admin: &limits-admin
+  mem_limit: 768m
+  memswap_limit: 768m
+  cpus: 0.75
+  deploy:
+    resources:
+      limits:
+        cpus: '0.75'
+        memory: 768M
+      reservations:
+        cpus: '0.15'
+        memory: 192M
+
+x-limits-landing: &limits-landing
+  mem_limit: 1024m
+  memswap_limit: 1024m
+  cpus: 1.0
+  deploy:
+    resources:
+      limits:
+        cpus: '1.0'
+        memory: 1024M
+      reservations:
+        cpus: '0.25'
+        memory: 256M
+
+x-prod-logging: &prod-logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+x-monorepo-build: &monorepo-build
+  context: .
+  dockerfile: docker/prod-monorepo.Dockerfile
+  args: &monorepo-build-args
+    # Defaults match production public origins (never localhost — see NL-BUG-CMS-001/002).
+    WEB_NEXT_PUBLIC_API_URL: ${WEB_NEXT_PUBLIC_API_URL:-https://app.nestlancer.com}
+    WEB_NEXT_PUBLIC_APP_URL: ${WEB_NEXT_PUBLIC_APP_URL:-https://app.nestlancer.com}
+    ADMIN_NEXT_PUBLIC_API_URL: ${ADMIN_NEXT_PUBLIC_API_URL:-https://admin.nestlancer.com}
+    ADMIN_NEXT_PUBLIC_APP_URL: ${ADMIN_NEXT_PUBLIC_APP_URL:-https://app.nestlancer.com}
+    ADMIN_NEXT_PUBLIC_ADMIN_APP_URL: ${ADMIN_NEXT_PUBLIC_ADMIN_APP_URL:-https://admin.nestlancer.com}
+    LANDING_NEXT_PUBLIC_API_URL: ${LANDING_NEXT_PUBLIC_API_URL:-https://nestlancer.com}
+    LANDING_NEXT_PUBLIC_APP_URL: ${LANDING_NEXT_PUBLIC_APP_URL:-https://app.nestlancer.com}
+    LANDING_NEXT_PUBLIC_LANDING_URL: ${LANDING_NEXT_PUBLIC_LANDING_URL:-https://nestlancer.com}
+    NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-https://api.nestlancer.com}
+    NEXT_PUBLIC_SOCKET_IO_PATH: ${NEXT_PUBLIC_SOCKET_IO_PATH:-/ws/socket.io}
+    NEXT_PUBLIC_API_PROXY: ${NEXT_PUBLIC_API_PROXY:-true}
+    NEXT_PUBLIC_AUTH_REFRESH_BFF: ${NEXT_PUBLIC_AUTH_REFRESH_BFF:-true}
+    NEXT_PUBLIC_RAZORPAY_KEY_ID: ${NEXT_PUBLIC_RAZORPAY_KEY_ID:-}
+    NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY: ${NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY:-}
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+    NEXT_PUBLIC_TURNSTILE_BYPASS_TOKEN: ${NEXT_PUBLIC_TURNSTILE_BYPASS_TOKEN:-}
+    API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:4000}
+
+services:
+  web:
+    <<: *limits-web
+    image: ${NESTLANCER_IMAGE_REGISTRY:-ghcr.io/nestlancer}/frontend-web:${NESTLANCER_IMAGE_TAG:-latest}
+    build:
+      <<: *monorepo-build
+      target: frontend-web
+      args:
+        <<: *monorepo-build-args
+        APP_PORT: "9000"
+    container_name: nestlancer-frontend-web-prod
+    env_file:
+      - .env.infisical
+    environment:
+      NODE_ENV: production
+      PORT: "9000"
+      NODE_OPTIONS: '--max-old-space-size=768'
+      API_UPSTREAM: http://host.docker.internal:4000
+      # Runtime (non-NEXT_PUBLIC) origin — overrides baked localhost in SEO/sitemap.
+      APP_ORIGIN: ${APP_ORIGIN:-https://app.nestlancer.com}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NESTLANCER_SERVICE: nl-prod-frontend-web
+    ports:
+      - "9000:9000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *prod-logging
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/']
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+
+  admin:
+    <<: *limits-admin
+    image: ${NESTLANCER_IMAGE_REGISTRY:-ghcr.io/nestlancer}/frontend-admin:${NESTLANCER_IMAGE_TAG:-latest}
+    build:
+      <<: *monorepo-build
+      target: frontend-admin
+      args:
+        <<: *monorepo-build-args
+        APP_PORT: "9010"
+    container_name: nestlancer-frontend-admin-prod
+    env_file:
+      - .env.infisical
+    environment:
+      NODE_ENV: production
+      PORT: "9010"
+      NODE_OPTIONS: '--max-old-space-size=512'
+      API_UPSTREAM: http://host.docker.internal:4000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NESTLANCER_SERVICE: nl-prod-frontend-admin
+    ports:
+      - "9010:9010"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *prod-logging
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9010/']
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5
+
+  landing:
+    <<: *limits-landing
+    image: ${NESTLANCER_IMAGE_REGISTRY:-ghcr.io/nestlancer}/frontend-landing:${NESTLANCER_IMAGE_TAG:-latest}
+    build:
+      <<: *monorepo-build
+      target: frontend-landing
+      args:
+        <<: *monorepo-build-args
+        APP_PORT: "9020"
+    container_name: nestlancer-frontend-landing-prod
+    env_file:
+      - .env.infisical
+    environment:
+      NODE_ENV: production
+      PORT: "9020"
+      NODE_OPTIONS: '--max-old-space-size=768'
+      APP_ORIGIN: ${APP_ORIGIN:-https://app.nestlancer.com}
+      API_UPSTREAM: http://host.docker.internal:4000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      NESTLANCER_SERVICE: nl-prod-frontend-landing
+    ports:
+      - "9020:9020"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *prod-logging
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9020/']
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 5

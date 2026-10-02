@@ -1,0 +1,37 @@
+{
+  "name": "@nestlancer/auth",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./server": {
+      "types": "./src/bff.server.ts",
+      "default": "./src/bff.server.ts"
+    }
+  },
+  "scripts": {
+    "build": "echo '@nestlancer/auth: no emit'",
+    "lint": "eslint src --ext .ts,.tsx",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@nestlancer/config": "workspace:*",
+    "@nestlancer/types": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "next": "^14.2.18",
+    "react": "^18.3.1",
+    "vitest": "^2.1.8"
+  }
+}

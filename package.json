@@ -52,7 +52,9 @@
     "docker:prod:local:start": "pnpm docker:prod:local:build && pnpm docker:prod:local:up",
     "k3s:generate": "node scripts/deploy/generate-k3s-manifests.mjs",
     "k3s:validate": "bash scripts/deploy/k3s-validate.sh",
-    "k3s:local:test": "bash scripts/deploy/k3s-local-test.sh"
+    "k3s:local:test": "bash scripts/deploy/k3s-local-test.sh",
+    "docs:changelog": "node scripts/docs/generate-changelog.mjs",
+    "docs:components": "node scripts/docs/generate-frontend-docs.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",

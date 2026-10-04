@@ -42,4 +42,4 @@ K3s clusters need `ghcr-credentials` in namespace `nestlancer-frontend` before w
 
 ## Docs
 
-- [Production VPS deploy](../docs/guides/production-vps-deploy.md)
+- [Production VPS deploy](../docs/operations/deployment-prod-vps.md)

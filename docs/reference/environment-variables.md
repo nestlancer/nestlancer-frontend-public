@@ -45,7 +45,7 @@ Compose sets `NEXT_PUBLIC_API_URL` per app (`dev-web`, `dev-admin`, etc.) with `
 | `LOG_LEVEL`          | `debug` \| `info` \| `warn` \| `error`. Dev Infisical: `debug`; prod: `info`                    |
 | `NESTLANCER_SERVICE` | Optional override for log `service` field (Compose sets `nl-prod-frontend-{web,admin,landing}`) |
 
-Structured JSON logging: [`docs/guides/logging.md`](./logging.md). View with `pnpm docker:prod:logs` / `pnpm docker:logs:web`.
+Structured JSON logging: [`docs/operations/logging.md`](../operations/logging.md). View with `pnpm docker:prod:logs` / `pnpm docker:logs:web`.
 
 ## Turnstile (Cloudflare)
 
@@ -89,4 +89,4 @@ Backend holds `TURNSTILE_SECRET_KEY` (never store the secret in the frontend Inf
 | `API_UPSTREAM` / `NEXT_PUBLIC_WS_URL`     | Gateway + `ws-gateway` deployment                           |
 | `NEXT_PUBLIC_APP_URL`                     | `FRONTEND_URL` (email links)                                |
 
-See [infisical.md](./infisical.md) for secrets manager setup and [logging.md](./logging.md) for container logs.
+See [infisical.md](./infisical.md) for secrets manager setup and [logging.md](../operations/logging.md) for container logs.

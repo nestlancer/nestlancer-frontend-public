@@ -1,29 +1,13 @@
-<div align="center">
-
 # @nestlancer/field-help
 
-### Contextual form tooltips.
-
-</div>
-
----
-
-## 📖 Table of Contents
-
-- [Package info](#package-info)
-- [Workspace dependencies](#workspace-dependencies)
-- [📚 Related documentation](#related-documentation)
-
----
+Contextual form tooltips.
 
 ## Package info
 
 |            |                                               |
-| :--------- | :-------------------------------------------- |
+| ---------- | --------------------------------------------- |
 | **Path**   | `packages/field-help/`                        |
 | **Import** | `import { … } from '@nestlancer/field-help';` |
-
----
 
 ## Workspace dependencies
 
@@ -31,17 +15,7 @@
 
 Radix tooltip + help copy for complex admin/web forms.
 
----
+## Related documentation
 
-## 📚 Related documentation
-
-- [Frontend architecture](../../architecture/ARCHITECTURE.md)
+- [Frontend architecture](../../architecture/overview.md)
 - [CHANGELOG](../../changelog/CHANGELOG.md)
-
----
-
-<div align="center">
-
-**@nestlancer/field-help** — Nestlancer backend component documentation
-
-</div>

@@ -126,7 +126,7 @@ Hooks are tested indirectly via feature components; add unit tests with `@testin
 ## 📚 Related documentation
 
 - [Web app](../apps/web.md)
-- [Frontend architecture](../../architecture/ARCHITECTURE.md)
+- [Frontend architecture](../../architecture/overview.md)
 - [Modification playbook](../../guides/modification-playbook.md)
 
 ---

@@ -1223,7 +1223,7 @@ nestlancer-frontend/
 │
 ├── docs/
 │   ├── architecture/
-│   │   ├── ARCHITECTURE.md           # This document
+│   │   ├── overview.md           # This document
 │   │   └── diagrams/
 │   ├── components/
 │   │   └── STORYBOOK.md

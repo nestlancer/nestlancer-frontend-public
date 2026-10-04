@@ -127,9 +127,9 @@ chmod 600 .env.infisical
 
 Reference docs:
 
-- `docs/guides/infisical.md`
-- `docs/guides/environment-variables.md`
-- `docs/guides/logging.md` — container JSON logs (`pnpm docker:prod:logs`)
+- `docs/operations/secrets-infisical.md`
+- `docs/reference/environment-variables.md`
+- `docs/operations/logging.md` — container JSON logs (`pnpm docker:prod:logs`)
 - `.env.production.example`
 
 ## Run Locally (Development)
@@ -264,7 +264,7 @@ pnpm docker:prod:build:one frontend-web
 pnpm docker:prod:build
 ```
 
-Do **not** wipe `.cache/docker-buildkit` or run `docker builder prune -af` between iterations. Details: `docs/guides/prod-deployment.md`.
+Do **not** wipe `.cache/docker-buildkit` or run `docker builder prune -af` between iterations. Details: `docs/operations/deployment-prod-compose.md`.
 
 ## Deploy to VPS (Compose)
 
@@ -340,7 +340,9 @@ Recommended commit style: `type(scope): subject`
 
 For a beginner-first walkthrough (new laptop setup, local run, GHCR release, VPS deploy, rollback), use:
 
-- `STEP_BY_STEP_GUIDE.md`
+- [`docs/development/setup.md`](docs/development/setup.md)
+- [`docs/README.md`](docs/README.md)
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`SECURITY.md`](SECURITY.md)
 
 ## Operator Runbook (Day-2 Ops)
 
@@ -354,7 +356,7 @@ For a beginner-first walkthrough (new laptop setup, local run, GHCR release, VPS
 
 ### B) Log Triage Sequence
 
-Server JSON logs land in **container stdout** (not the browser console). Full guide: `docs/guides/logging.md`.
+Server JSON logs land in **container stdout** (not the browser console). Full guide: `docs/operations/logging.md`.
 
 ```bash
 # 1) Combined prod logs

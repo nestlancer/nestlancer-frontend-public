@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const docs = path.join(root, 'docs/components');
 
 function listPages(appDir) {
@@ -108,7 +108,7 @@ Server Components are used where data can be fetched on the server (public blog/
 | \`NEXT_PUBLIC_WS_URL\` | Socket.IO origin |
 | \`NEXT_PUBLIC_SOCKET_IO_PATH\` | Default \`/ws/socket.io\` |
 
-Details: root \`.env.development\` and [backend env guide](../../../nestlancer-backend-api/docs/guides/environment-variables.md).
+Details: root \`.env.development\` and [backend env guide](../../../../nestlancer-backend-api/docs/reference/environment-variables.md).
 
 ## Commands
 
@@ -130,7 +130,7 @@ Docker: \`pnpm docker:start\` (web on 9000) — [nginx guide](../../guides/nginx
 
 ## Related documentation
 
-- [Frontend architecture](../../architecture/ARCHITECTURE.md) — full ADRs, patterns, security
+- [Frontend architecture](../../architecture/overview.md) — full ADRs, patterns, security
 - [Directory structure](../../architecture/dir-structure.md)
 - [Wireframes — user & public](../../architecture/diagrams/wireframes/)
 - [API client](../packages/api-client.md)
@@ -382,7 +382,7 @@ ${meta.sections}
 
 ## Related documentation
 
-- [Frontend architecture](../../architecture/ARCHITECTURE.md)
+- [Frontend architecture](../../architecture/overview.md)
 - [CHANGELOG](../../changelog/CHANGELOG.md)
 `;
   fs.writeFileSync(path.join(docs, 'packages', `${name}.md`), body);

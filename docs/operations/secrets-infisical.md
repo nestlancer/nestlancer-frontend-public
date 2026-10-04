@@ -1,6 +1,6 @@
 # Infisical — Frontend
 
-Same pattern as [nestlancer-backend-api/docs/guides/infisical.md](../../../nestlancer-backend-api/docs/guides/infisical.md).
+Same pattern as [nestlancer-backend-api/docs/operations/secrets-infisical.md](../../../nestlancer-backend-api/docs/operations/secrets-infisical.md).
 
 ## Project
 

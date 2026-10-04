@@ -1,42 +1,22 @@
-<div align="center">
-
 # @nestlancer/api-client
 
-### Typed HTTP access to the gateway OpenAPI contract.
-
-</div>
-
----
-
-## 📖 Table of Contents
-
-- [Package info](#package-info)
-- [Workspace dependencies](#workspace-dependencies)
-- [🏗 Architecture](#architecture)
-- [Regenerating the client](#regenerating-the-client)
-- [Response envelope](#response-envelope)
-- [Consumers](#consumers)
-- [📚 Related documentation](#related-documentation)
-
----
+Typed HTTP access to the gateway OpenAPI contract.
 
 ## Package info
 
 |            |                                               |
-| :--------- | :-------------------------------------------- |
+| ---------- | --------------------------------------------- |
 | **Path**   | `packages/api-client/`                        |
 | **Import** | `import { … } from '@nestlancer/api-client';` |
-
----
 
 ## Workspace dependencies
 
 - `@nestlancer/auth`
+- `@nestlancer/config`
 - `@nestlancer/types`
+- `@nestlancer/utils`
 
----
-
-## 🏗 Architecture
+## Architecture
 
 ```
 swagger-docs/openapi-gateway.json
@@ -46,8 +26,6 @@ swagger-docs/openapi-gateway.json
         → src/services/      # Hand-written facades for other domains
         → src/interceptors/  # auth, errors, retry
 ```
-
----
 
 ## Regenerating the client
 
@@ -59,30 +37,16 @@ pnpm contract:check  # pre-push: drift + Spectral
 
 **Never hand-edit** `src/generated/**`.
 
----
-
 ## Response envelope
 
 Gateway returns `{ status, message, data, metadata }`. Interceptors unwrap `data` for callers.
-
----
 
 ## Consumers
 
 - `apps/web`, `apps/admin` feature hooks
 - Prefer feature-level hooks over calling generated functions directly in pages
 
----
+## Related documentation
 
-## 📚 Related documentation
-
-- [Frontend architecture](../../architecture/ARCHITECTURE.md)
+- [Frontend architecture](../../architecture/overview.md)
 - [CHANGELOG](../../changelog/CHANGELOG.md)
-
----
-
-<div align="center">
-
-**@nestlancer/api-client** — Nestlancer backend component documentation
-
-</div>

@@ -296,8 +296,8 @@ pnpm contract:check  # verify no drift
 
 ## Related docs (in repo)
 
-- `docs/guides/prod-deployment.md` — production (same VPS, different path)
-- `docs/guides/infisical.md`
-- `docs/guides/environment-variables.md`
-- `docs/guides/logging.md` — container JSON logs (`pnpm docker:logs:web`)
-- `docs/guides/troubleshooting.md`
+- `docs/operations/deployment-prod-compose.md` — production (same VPS, different path)
+- `docs/operations/secrets-infisical.md`
+- `docs/reference/environment-variables.md`
+- `docs/operations/logging.md` — container JSON logs (`pnpm docker:logs:web`)
+- `docs/development/troubleshooting.md`

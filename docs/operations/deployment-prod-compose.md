@@ -469,10 +469,10 @@ Use the **same tag version** on both repos for traceability.
 
 ## Related docs (in repo)
 
-- `docs/guides/dev-deployment.md` — development (same VPS)
-- `docs/guides/production-vps-deploy.md`
-- `docs/guides/infisical.md`
-- `docs/guides/environment-variables.md`
-- `docs/guides/logging.md` — container JSON logs (`pnpm docker:prod:logs`)
+- `docs/operations/deployment-dev.md` — development (same VPS)
+- `docs/operations/deployment-prod-vps.md`
+- `docs/operations/secrets-infisical.md`
+- `docs/reference/environment-variables.md`
+- `docs/operations/logging.md` — container JSON logs (`pnpm docker:prod:logs`)
 - `docker/prod-monorepo.Dockerfile` — shared monorepo prod image stages
 - `docker/prod-monorepo.bake.hcl` — bake targets / groups

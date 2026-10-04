@@ -148,7 +148,7 @@ File: repo root `.env.development` — [nginx](./nginx.md) for subdomain setup.
 | `contact`             | contact                     | `/api/v1/contact`                      |
 | admin features        | admin + domain admin routes | `/api/v1/admin`                        |
 
-Backend playbook: [nestlancer-backend-api/docs/guides/modification-playbook.md](../../../nestlancer-backend-api/docs/guides/modification-playbook.md).
+Backend playbook: [nestlancer-backend-api/docs/development/modification-playbook.md](../../../nestlancer-backend-api/docs/development/modification-playbook.md).
 
 ---
 
@@ -162,7 +162,7 @@ Backend playbook: [nestlancer-backend-api/docs/guides/modification-playbook.md](
 
 ## Related
 
-- [ARCHITECTURE.md](../architecture/ARCHITECTURE.md)
+- [overview.md](../architecture/overview.md)
 - [dir-structure.md](../architecture/dir-structure.md)
 - [api-client](../components/packages/api-client.md)
 - [CHANGELOG](../changelog/CHANGELOG.md)

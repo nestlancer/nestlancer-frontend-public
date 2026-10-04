@@ -88,7 +88,7 @@ Usually client-only state in Server Components. Add `'use client'` to components
 
 - [logging.md](./logging.md)
 - [modification-playbook.md](./modification-playbook.md)
-- [Backend troubleshooting](../../../nestlancer-backend-api/docs/guides/troubleshooting.md)
+- [Backend troubleshooting](../../../nestlancer-backend-api/docs/development/troubleshooting.md)
 
 ---
 

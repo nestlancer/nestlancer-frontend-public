@@ -94,7 +94,7 @@ Runs automatically on `pre-push` via `contract:check`.
 ## Read next (order)
 
 1. [docs/README.md](../README.md)
-2. [architecture/ARCHITECTURE.md](../architecture/ARCHITECTURE.md) — RSC, Query, auth
+2. [architecture/overview.md](../architecture/overview.md) — RSC, Query, auth
 3. [modification-playbook.md](./modification-playbook.md)
 4. [components/apps/web.md](../components/apps/web.md) or [admin.md](../components/apps/admin.md)
 5. Wireframes for UX: [diagrams/wireframes/](../architecture/diagrams/wireframes/README.md)
@@ -127,15 +127,15 @@ Shared code lives in `packages/*` — see [components/packages/](../components/p
 ## Regenerate docs
 
 ```bash
-node scripts/generate-frontend-docs.mjs
-node scripts/generate-changelog.mjs
+node scripts/docs/generate-frontend-docs.mjs
+node scripts/docs/generate-changelog.mjs
 ```
 
 ---
 
 ## Backend onboarding
 
-[nestlancer-backend-api/docs/guides/onboarding.md](../../../nestlancer-backend-api/docs/guides/onboarding.md)
+[nestlancer-backend-api/docs/development/setup.md](../../../nestlancer-backend-api/docs/development/setup.md)
 
 ---
 

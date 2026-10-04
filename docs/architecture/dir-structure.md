@@ -649,7 +649,7 @@ nestlancer-frontend/
 │
 ├── docs/
 │   ├── architecture/
-│   │   ├── ARCHITECTURE.md
+│   │   ├── overview.md
 │   │   └── diagrams/
 │   │       ├── wireframes/           # UX wireframes (public / user / admin); see appendix below
 │   │       │   ├── README.md

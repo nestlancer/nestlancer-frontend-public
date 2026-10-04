@@ -96,7 +96,7 @@ Primitives should ship with focus visible styles, `aria-*` on interactive elemen
 
 - [tokens](./tokens.md), [theme](./theme.md)
 - [Web app](../apps/web.md), [Admin app](../apps/admin.md)
-- [ARCHITECTURE.md § Component Library](../../architecture/ARCHITECTURE.md)
+- [overview.md § Component Library](../../architecture/overview.md)
 
 ---
 

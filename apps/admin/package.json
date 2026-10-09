@@ -31,7 +31,7 @@
     "@nestlancer/utils": "workspace:*",
     "@nestlancer/validators": "workspace:*",
     "@nestlancer/websocket": "workspace:*",
-    "@tanstack/react-query": "^5.62.8",
+    "@tanstack/react-query": "^5.104.1",
     "next": "^14.2.18",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",

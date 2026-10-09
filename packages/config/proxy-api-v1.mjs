@@ -52,6 +52,9 @@ export async function proxyApiV1(request, pathSegments) {
 
   const headers = new Headers(request.headers);
   for (const name of HOP_BY_HOP) headers.delete(name);
+  // BFF keeps refresh/impersonation in HttpOnly cookies; API auth is Bearer only.
+  // Never forward browser auth cookies to the gateway (NL-BV-F1-03).
+  headers.delete('cookie');
 
   const init = {
     method: request.method,

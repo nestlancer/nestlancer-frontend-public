@@ -841,6 +841,27 @@ export function extractProjectStatsSummary(data: unknown): ProjectStatsSummary |
   };
 }
 
+/** API envelope / series keys that must not surface as KPI tile labels. */
+const METRIC_TILE_SKIP = new Set([
+  'chartData',
+  'chart',
+  'series',
+  'data',
+  'items',
+  'rows',
+  'meta',
+  'pagination',
+  'status',
+  'success',
+  'message',
+  'error',
+  'errors',
+  'links',
+  'categories',
+  'breakdown',
+  'timeline',
+]);
+
 export function extractMetricTiles(data: unknown, title = 'Metrics'): KpiItem[] {
   if (Array.isArray(data)) {
     return [{ label: title, value: formatNumber(data.length) }];
@@ -856,6 +877,7 @@ export function extractMetricTiles(data: unknown, title = 'Metrics'): KpiItem[] 
   }
   for (const [k, v] of Object.entries(r)) {
     if (kpis.length >= 8) break;
+    if (METRIC_TILE_SKIP.has(k)) continue;
     if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
       const inner = asRecord(v);
       if (inner && ('current' in inner || 'count' in inner || 'total' in inner)) {

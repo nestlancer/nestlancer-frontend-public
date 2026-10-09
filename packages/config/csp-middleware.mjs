@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { applyContentSecurityPolicy } from './csp.mjs';
+import { applySecurityHeaders } from './security-headers.mjs';
 
 /** Generate a per-request CSP nonce. */
 export function createCspNonce() {
@@ -21,10 +22,38 @@ export function nextWithCspNonce(request, nonce) {
   });
 }
 
+/** Machine-readable routes: browsers may pretty-print XML with inline styles. */
+function isMachineReadablePath(pathname) {
+  if (!pathname || typeof pathname !== 'string') return false;
+  const p = pathname.toLowerCase();
+  return (
+    p.endsWith('.xml') ||
+    p.endsWith('.txt') ||
+    p.endsWith('.json') ||
+    p.includes('/.well-known/')
+  );
+}
+
+function pathnameFromRequest(request) {
+  if (!request) return '';
+  if (request.nextUrl?.pathname) return request.nextUrl.pathname;
+  try {
+    return new URL(request.url).pathname;
+  } catch {
+    return '';
+  }
+}
+
 /** Attach CSP + response nonce header to any middleware response. */
-export function applyCspNonce(response, nonce) {
+export function applyCspNonce(response, nonce, request) {
+  // Keep baseline security headers on XML/text; skip nonce CSP (Chrome XML viewer noise).
+  if (isMachineReadablePath(pathnameFromRequest(request))) {
+    applySecurityHeaders(response);
+    return response;
+  }
   applyContentSecurityPolicy(response, nonce);
   response.headers.set('x-nonce', nonce);
+  applySecurityHeaders(response);
   return response;
 }
 
@@ -55,7 +84,7 @@ function finalizeWithCsp(request, response, nonce) {
 
   const isRedirect = response.status >= 300 && response.status < 400;
   if (isRedirect || !request) {
-    return applyCspNonce(response, nonce);
+    return applyCspNonce(response, nonce, request);
   }
 
   const rewriteTo = response.headers.get('x-middleware-rewrite');
@@ -68,20 +97,20 @@ function finalizeWithCsp(request, response, nonce) {
     response.cookies.getAll().forEach((cookie) => {
       out.cookies.set(cookie);
     });
-    return applyCspNonce(out, nonce);
+    return applyCspNonce(out, nonce, request);
   }
 
   // Terminal middleware body (e.g. hard 404 HTML) — keep status/body.
   const isMiddlewareNext = response.headers.get('x-middleware-next') === '1';
   if (!isMiddlewareNext) {
-    return applyCspNonce(response, nonce);
+    return applyCspNonce(response, nonce, request);
   }
 
   const out = nextWithCspNonce(request, nonce);
   response.cookies.getAll().forEach((cookie) => {
     out.cookies.set(cookie);
   });
-  return applyCspNonce(out, nonce);
+  return applyCspNonce(out, nonce, request);
 }
 
 function finalizeCspMiddleware(request, response, nonce) {

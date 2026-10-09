@@ -8,6 +8,8 @@ import {
   gatewayLoginErrorResponse,
   isGateway2FAChallenge,
   logAuthEvent,
+  normalizeUserRole,
+  portalRoleMismatchResponse,
   postGatewayLogin,
   type GatewayAuthTokens,
 } from '@nestlancer/auth';
@@ -70,29 +72,13 @@ async function postHandler(request: Request) {
     return NextResponse.json({ status: 'success', data });
   }
 
-  // Server-side role gate — admin operators must use the admin app.
-  const role = String((data.user as { role?: string } | undefined)?.role ?? '').toUpperCase();
-  if (role === 'ADMIN') {
-    logAuthEvent({
-      event: 'auth.login',
-      request,
-      outcome: 'portal_mismatch',
-      portal: 'client',
-      serviceFallback: SERVICE,
-      code: 'AUTH_PORTAL_MISMATCH',
-    });
-    return NextResponse.json(
-      {
-        message: 'Admin accounts must sign in on the admin app',
-        error: {
-          message: 'Admin accounts must sign in on the admin app',
-          code: 'AUTH_PORTAL_MISMATCH',
-        },
-        code: 'AUTH_PORTAL_MISMATCH',
-      },
-      { status: 403 }
-    );
-  }
+  const portalMismatch = portalRoleMismatchResponse(
+    request,
+    'client',
+    normalizeUserRole(data.user),
+    SERVICE
+  );
+  if (portalMismatch) return portalMismatch;
 
   const rememberMe =
     typeof payload === 'object' &&

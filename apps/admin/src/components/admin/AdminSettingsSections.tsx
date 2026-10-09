@@ -24,18 +24,20 @@ export function SettingsSection({
   className?: string;
 }) {
   return (
-    <Card className={`${adminCardClass}${className ? ` ${className}` : ''}`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <Card className={`${adminCardClass} !p-4${className ? ` ${className}` : ''}`}>
+      <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <Text className="font-medium text-foreground">{title}</Text>
-          {description ? <Text className="mt-1 text-muted-foreground">{description}</Text> : null}
+          <Text className="text-sm font-semibold text-foreground">{title}</Text>
+          {description ? (
+            <Text className="mt-0.5 text-xs text-muted-foreground">{description}</Text>
+          ) : null}
         </div>
         {actions ? (
-          <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
+          <div className="flex shrink-0 flex-wrap items-center gap-1.5">{actions}</div>
         ) : null}
       </div>
-      <Divider className="my-5" />
-      <div className="divide-y divide-border">{children}</div>
+      <Divider className="my-3" />
+      <div className="divide-y divide-border/60">{children}</div>
     </Card>
   );
 }
@@ -57,7 +59,7 @@ export function SettingsRow({
   children: ReactNode;
 }) {
   return (
-    <div className="grid gap-4 py-4 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center lg:gap-8">
+    <div className="grid gap-3 py-3 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto] md:items-center lg:gap-6">
       <div className="min-w-0">
         <Text className="inline-flex items-center gap-1 font-medium text-foreground">
           {htmlFor ? (
@@ -217,6 +219,7 @@ export function FeatureFlagList({
                 checked={checked}
                 onChange={(v) => onChange?.(flag.key, v)}
                 disabled={readOnly}
+                aria-label={`Toggle ${flag.label}`}
               />
             </div>
           </SettingsRow>

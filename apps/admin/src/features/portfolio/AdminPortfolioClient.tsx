@@ -11,7 +11,7 @@ import { Button, Input, PortfolioTimeline } from '@nestlancer/ui';
 import { useAdminConfirm } from '@/components/admin/AdminConfirmDialog';
 import { AdminQueryState } from '@/components/admin/AdminConsolePrimitives';
 import { PageHeader, StatusPill } from '@/components/admin/AdminDataViews';
-import { AdminMetricStrip } from '@/components/admin/AdminPageChrome';
+import { AdminDataShell, AdminMetricStrip } from '@/components/admin/AdminPageChrome';
 import { adminKeys } from '@/lib/admin-query-keys';
 import { pickAdminPagination, pickAdminRows } from '@/lib/admin-response';
 import { apiServices } from '@/lib/axios';
@@ -41,37 +41,39 @@ function PortfolioAnalyticsCards({ data, compact }: { data: unknown; compact?: b
   const topItems = Array.isArray(analytics.topItems) ? analytics.topItems : [];
 
   return (
-    <div className="space-y-4">
-      <div className={`grid gap-3 ${compact ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
-        <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Total views
+    <div className="space-y-3">
+      <div
+        className={`grid overflow-hidden divide-x divide-border/50 border-b border-border/40 ${
+          compact ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'
+        }`}
+      >
+        <div className="px-3 py-2">
+          <p className="text-[11px] font-medium text-muted-foreground">Total views</p>
+          <p className="mt-0.5 text-base font-semibold tabular-nums">
+            {totalViews.toLocaleString()}
           </p>
-          <p className="mt-1 text-2xl font-semibold tabular-nums">{totalViews.toLocaleString()}</p>
         </div>
-        <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Total likes
+        <div className="px-3 py-2">
+          <p className="text-[11px] font-medium text-muted-foreground">Total likes</p>
+          <p className="mt-0.5 text-base font-semibold tabular-nums">
+            {totalLikes.toLocaleString()}
           </p>
-          <p className="mt-1 text-2xl font-semibold tabular-nums">{totalLikes.toLocaleString()}</p>
         </div>
         {!compact ? (
-          <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Top items
-            </p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums">{topItems.length}</p>
+          <div className="px-3 py-2">
+            <p className="text-[11px] font-medium text-muted-foreground">Top items</p>
+            <p className="mt-0.5 text-base font-semibold tabular-nums">{topItems.length}</p>
           </div>
         ) : null}
       </div>
       {topItems.length > 0 ? (
-        <div className="overflow-x-auto rounded-lg border border-border">
+        <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-border bg-muted/30 text-xs uppercase text-muted-foreground">
+            <thead className="border-b border-border/60 bg-muted/20 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 font-medium">Item</th>
-                <th className="px-3 py-2 font-medium">Views</th>
-                <th className="px-3 py-2 font-medium">Likes</th>
+                <th className="px-3 py-1.5">Item</th>
+                <th className="px-3 py-1.5">Views</th>
+                <th className="px-3 py-1.5">Likes</th>
               </tr>
             </thead>
             <tbody>
@@ -81,10 +83,13 @@ function PortfolioAnalyticsCards({ data, compact }: { data: unknown; compact?: b
                 const views = Number(item.views ?? item.viewCount ?? 0);
                 const likes = Number(item.likes ?? item.likeCount ?? 0);
                 return (
-                  <tr key={String(item.id ?? title)} className="border-b border-border/60">
-                    <td className="px-3 py-2 font-medium">{title}</td>
-                    <td className="px-3 py-2 tabular-nums">{views.toLocaleString()}</td>
-                    <td className="px-3 py-2 tabular-nums">{likes.toLocaleString()}</td>
+                  <tr
+                    key={String(item.id ?? title)}
+                    className="border-b border-border/40 hover:bg-muted/30"
+                  >
+                    <td className="px-3 py-1.5 font-medium">{title}</td>
+                    <td className="px-3 py-1.5 tabular-nums">{views.toLocaleString()}</td>
+                    <td className="px-3 py-1.5 tabular-nums">{likes.toLocaleString()}</td>
                   </tr>
                 );
               })}
@@ -92,7 +97,7 @@ function PortfolioAnalyticsCards({ data, compact }: { data: unknown; compact?: b
           </table>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">No engagement data yet.</p>
+        <p className="px-3 text-sm text-muted-foreground">No engagement data yet.</p>
       )}
     </div>
   );
@@ -254,99 +259,109 @@ export function AdminPortfolioClient() {
         max={4}
       />
 
-      <section className="ge-card overflow-hidden">
-        <div className="ge-card-body space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold">Categories</h2>
-            <p className="text-sm text-muted-foreground">Organize portfolio items by category.</p>
-          </div>
-          <AdminQueryState isLoading={categoriesQ.isLoading} error={categoriesQ.error}>
-            <ul className="flex flex-wrap gap-2">
-              {categoryRows.map((cat, i) => {
-                const id = String(cat.id ?? `cat-${i}`);
-                const name = String(cat.name ?? id);
-                return (
-                  <li
-                    key={id}
-                    className="flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-sm"
+      <section className="rounded-lg border border-border/40 bg-muted/10 p-3">
+        <div className="mb-2">
+          <h3 className="text-xs font-bold text-foreground">Categories</h3>
+          <p className="text-[10px] text-muted-foreground">Organize portfolio items by category.</p>
+        </div>
+        <AdminQueryState isLoading={categoriesQ.isLoading} error={categoriesQ.error}>
+          <ul className="flex flex-wrap gap-1.5">
+            {categoryRows.map((cat, i) => {
+              const id = String(cat.id ?? `cat-${i}`);
+              const name = String(cat.name ?? id);
+              return (
+                <li
+                  key={id}
+                  className="flex items-center gap-1 rounded border border-border/20 bg-muted/60 px-2 py-0.5 text-xs"
+                >
+                  <span className="font-medium text-foreground">{name}</span>
+                  <button
+                    type="button"
+                    className="text-[10px] text-destructive hover:underline disabled:opacity-50"
+                    disabled={deleteCategoryM.isPending}
+                    onClick={async () => {
+                      const { confirmed } = await confirm({
+                        title: 'Delete category',
+                        description: `Delete "${name}"?`,
+                        destructive: true,
+                      });
+                      if (!confirmed) return;
+                      deleteCategoryM.mutate(id);
+                    }}
                   >
-                    <span>{name}</span>
-                    <button
-                      type="button"
-                      className="text-xs text-destructive hover:underline disabled:opacity-50"
-                      disabled={deleteCategoryM.isPending}
-                      onClick={async () => {
-                        const { confirmed } = await confirm({
-                          title: 'Delete category',
-                          description: `Delete "${name}"?`,
-                          destructive: true,
-                        });
-                        if (!confirmed) return;
-                        deleteCategoryM.mutate(id);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="mt-3 flex flex-wrap gap-2">
+                    Remove
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="mt-2 space-y-1">
+            <div className="flex flex-wrap gap-2">
               <Input
                 placeholder="New category name"
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 aria-label="New category name"
-                className="max-w-xs rounded-lg"
+                className="h-8 max-w-xs rounded-md text-sm"
               />
               <Button
                 size="sm"
                 disabled={!newCategoryName.trim() || createCategoryM.isPending}
+                title={!newCategoryName.trim() ? 'Enter a category name to enable add' : undefined}
                 onClick={() => createCategoryM.mutate()}
               >
                 Add category
               </Button>
             </div>
-          </AdminQueryState>
-        </div>
+            {!newCategoryName.trim() ? (
+              <p className="text-[11px] text-muted-foreground">
+                Enter a category name to enable Add category.
+              </p>
+            ) : null}
+          </div>
+        </AdminQueryState>
       </section>
 
-      <section className="ge-card overflow-hidden">
-        <div className="ge-card-body space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold">Analytics</h2>
-            <p className="text-sm text-muted-foreground">Global portfolio engagement metrics.</p>
-          </div>
-          <AdminQueryState isLoading={globalAnalyticsQ.isLoading} error={globalAnalyticsQ.error}>
-            <PortfolioAnalyticsCards data={globalAnalyticsQ.data} />
-          </AdminQueryState>
-          {analyticsItemId ? (
-            <div className="rounded-lg border border-border bg-muted/10 p-3">
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">Analytics</h2>
+          <p className="text-sm text-muted-foreground">Global portfolio engagement metrics.</p>
+        </div>
+        <AdminDataShell
+          filter={
+            analyticsItemId ? (
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-medium">Item analytics</p>
                 <Button size="sm" variant="outline" onClick={() => setAnalyticsItemId(null)}>
                   Close
                 </Button>
               </div>
+            ) : undefined
+          }
+        >
+          <div className="space-y-3 p-3">
+            <AdminQueryState isLoading={globalAnalyticsQ.isLoading} error={globalAnalyticsQ.error}>
+              <PortfolioAnalyticsCards data={globalAnalyticsQ.data} />
+            </AdminQueryState>
+            {analyticsItemId ? (
               <AdminQueryState isLoading={itemAnalyticsQ.isLoading} error={itemAnalyticsQ.error}>
-                <div className="mt-2">
-                  <PortfolioAnalyticsCards data={itemAnalyticsQ.data} compact />
-                </div>
+                <PortfolioAnalyticsCards data={itemAnalyticsQ.data} compact />
               </AdminQueryState>
-            </div>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        </AdminDataShell>
       </section>
 
-      <section className="ge-card overflow-hidden">
-        <div className="ge-card-body space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Manage items</h2>
-              <p className="text-sm text-muted-foreground">
-                Create, edit, publish, and remove portfolio entries.
-              </p>
-            </div>
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">Manage items</h2>
+          <p className="text-sm text-muted-foreground">
+            Create, edit, publish, and remove portfolio entries.
+          </p>
+        </div>
+
+        <AdminDataShell
+          filter={
             <Input
               placeholder="Search portfolio…"
               value={search}
@@ -357,14 +372,14 @@ export function AdminPortfolioClient() {
               aria-label="Search portfolio"
               className="max-w-sm rounded-lg"
             />
-          </div>
-
+          }
+        >
           <AdminQueryState isLoading={listQ.isPending} error={listQ.error}>
             {rows.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No portfolio items found.</p>
+              <p className="p-4 text-sm text-muted-foreground">No portfolio items found.</p>
             ) : (
               <>
-                <div className="overflow-x-auto rounded-lg border border-border">
+                <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="border-b border-border bg-muted/40">
                       <tr>
@@ -509,25 +524,21 @@ export function AdminPortfolioClient() {
               </>
             )}
           </AdminQueryState>
-        </div>
+        </AdminDataShell>
       </section>
 
-      <section className="ge-card overflow-hidden border-dashed border-primary/30 bg-primary/5">
-        <div className="ge-card-body space-y-6">
-          <div>
-            <h2 className="font-display text-xl font-semibold tracking-tight">
-              Live timeline preview
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Compact date and title preview of the public project timeline, with scroll animation.
-            </p>
-          </div>
-          <PortfolioTimeline
-            entries={timelineEntries}
-            variant="admin"
-            emptyMessage="Add a portfolio item to see the timeline preview."
-          />
+      <section className="space-y-3 rounded-lg border border-dashed border-border/60 bg-muted/10 p-3">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Live timeline preview</h2>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Compact date and title preview of the public project timeline.
+          </p>
         </div>
+        <PortfolioTimeline
+          entries={timelineEntries}
+          variant="admin"
+          emptyMessage="Add a portfolio item to see the timeline preview."
+        />
       </section>
     </div>
   );

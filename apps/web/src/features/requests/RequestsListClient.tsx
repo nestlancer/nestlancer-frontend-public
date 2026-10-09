@@ -15,7 +15,6 @@ import {
   PageHeader,
   Pagination,
   SkeletonTable,
-  StatCard,
 } from '@nestlancer/ui';
 
 import { useDebouncedUrlParam } from '@/hooks/useDebouncedUrlParam';
@@ -30,7 +29,7 @@ import { WorkListItem, WorkListShell } from '@/features/work/WorkListItem';
 import { formatWorkStatusLabel } from '@/features/work/status-utils';
 import { parseWorkHubView, type WorkHubView } from '@/features/work/work-hub-tabs';
 import { trackEvent } from '@/lib/telemetry';
-import { webPrimaryButtonClass } from '@/lib/tailadmin-classes';
+import { webMetricStripClass, webPrimaryButtonClass } from '@/lib/tailadmin-classes';
 import { ClientListPage } from '@/components/web/ClientListPage';
 
 const PAGE_SIZE = 12;
@@ -189,35 +188,20 @@ export function RequestsListClient() {
       />
 
       {stats ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label="Total requests"
-            value={Number(stats.total ?? 0)}
-            icon={<Send className="h-5 w-5" aria-hidden />}
-            iconVariant="info"
-            stagger={1}
-          />
-          <StatCard
-            label="Under review"
-            value={underReview}
-            icon={<Send className="h-5 w-5" aria-hidden />}
-            iconVariant="warning"
-            stagger={2}
-          />
-          <StatCard
-            label="Quoted"
-            value={quoted}
-            icon={<Send className="h-5 w-5" aria-hidden />}
-            iconVariant="purple"
-            stagger={3}
-          />
-          <StatCard
-            label="Projects"
-            value={projectsCount}
-            icon={<FolderKanban className="h-5 w-5" aria-hidden />}
-            iconVariant="success"
-            stagger={4}
-          />
+        <div className={`${webMetricStripClass} sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4`}>
+          {[
+            { label: 'Total requests', value: Number(stats.total ?? 0) },
+            { label: 'Under review', value: underReview },
+            { label: 'Quoted', value: quoted },
+            { label: 'Projects', value: projectsCount },
+          ].map((t) => (
+            <div key={t.label} className="px-3.5 py-2.5">
+              <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{t.label}</p>
+              <p className="mt-0.5 text-lg font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white/90">
+                {t.value}
+              </p>
+            </div>
+          ))}
         </div>
       ) : null}
 
@@ -230,64 +214,114 @@ export function RequestsListClient() {
         }}
       />
 
-      <WorkFilterBar
-        search={search}
-        onSearchChange={setSearch}
-        status={statusFilter}
-        onStatusChange={setStatusFilter}
-        showStatusFilter={view === 'requests' || view === 'all'}
-      />
+      <WorkListShell>
+        <div className="border-b border-border/60 p-3">
+          <WorkFilterBar
+            className="border-0 bg-transparent p-0 shadow-none dark:bg-transparent"
+            search={search}
+            onSearchChange={setSearch}
+            status={statusFilter}
+            onStatusChange={setStatusFilter}
+            showStatusFilter={view === 'requests' || view === 'all'}
+          />
+        </div>
 
-      {isError ? (
-        <ErrorState
-          message="Could not load work items."
-          onRetry={() => {
-            void requestsQ.refetch();
-            void projectsQ.refetch();
-          }}
-        />
-      ) : null}
+        {isError ? (
+          <div className="p-4">
+            <ErrorState
+              message="Could not load work items."
+              onRetry={() => {
+                void requestsQ.refetch();
+                void projectsQ.refetch();
+              }}
+            />
+          </div>
+        ) : null}
 
-      {isLoading ? <SkeletonTable rows={6} cols={1} className="py-4" /> : null}
+        {isLoading ? <SkeletonTable rows={6} cols={1} className="p-4" /> : null}
 
-      {showEmpty ? (
-        <EmptyState
-          title={view === 'projects' ? 'No projects yet' : 'No work items yet'}
-          description={
-            view === 'projects'
-              ? 'Accept a quote to start a project, or browse your requests.'
-              : 'Create a request to describe the work you need from the Nestlancer team.'
-          }
-          action={
-            <Button className={webPrimaryButtonClass} asChild>
-              <Link href={view === 'projects' ? routes.quotes : routes.requestNew}>
-                {view === 'projects' ? 'View quotes' : 'New request'}
-              </Link>
-            </Button>
-          }
-        />
-      ) : null}
+        {showEmpty ? (
+          <div className="p-4">
+            <EmptyState
+              title={view === 'projects' ? 'No projects yet' : 'No work items yet'}
+              description={
+                view === 'projects'
+                  ? 'Accept a quote to start a project, or browse your requests.'
+                  : 'Create a request to describe the work you need from the Nestlancer team.'
+              }
+              action={
+                <Button className={webPrimaryButtonClass} asChild>
+                  <Link href={view === 'projects' ? routes.quotes : routes.requestNew}>
+                    {view === 'projects' ? 'View quotes' : 'New request'}
+                  </Link>
+                </Button>
+              }
+            />
+          </div>
+        ) : null}
 
-      {!isLoading && !showEmpty ? (
-        <WorkListShell>
-          {view === 'all'
-            ? mergedAll.slice(0, 20).map((row) =>
-                row.kind === 'request' ? (
+        {!isLoading && !showEmpty ? (
+          <>
+            {view === 'all'
+              ? mergedAll.slice(0, 20).map((row) =>
+                  row.kind === 'request' ? (
+                    <WorkListItem
+                      key={`req-${row.id}`}
+                      href={routes.request(row.id)}
+                      title={row.data.title}
+                      status={String(row.data.status)}
+                      kind="request"
+                      kindLabel={
+                        String(row.data.status).toLowerCase() === 'draft' ? 'Draft' : 'Request'
+                      }
+                      meta={[
+                        row.data.category
+                          ? formatRequestCategory(String(row.data.category))
+                          : 'Service request',
+                        row.data.createdAt
+                          ? new Date(row.data.createdAt).toLocaleDateString(undefined, {
+                              dateStyle: 'medium',
+                            })
+                          : '—',
+                      ]}
+                      icon={Send}
+                      iconVariant="warning"
+                    />
+                  ) : (
+                    <WorkListItem
+                      key={`proj-${row.id}`}
+                      href={routes.project(row.id)}
+                      title={row.data.title}
+                      status={String(row.data.status)}
+                      kind="project"
+                      kindLabel="Project"
+                      meta={[
+                        formatWorkStatusLabel(String(row.data.status)),
+                        row.data.createdAt
+                          ? new Date(row.data.createdAt).toLocaleDateString(undefined, {
+                              dateStyle: 'medium',
+                            })
+                          : '—',
+                      ]}
+                      icon={FolderKanban}
+                      iconVariant="success"
+                    />
+                  )
+                )
+              : null}
+            {view === 'requests'
+              ? filteredRequests.map((r) => (
                   <WorkListItem
-                    key={`req-${row.id}`}
-                    href={routes.request(row.id)}
-                    title={row.data.title}
-                    status={String(row.data.status)}
+                    key={r.id}
+                    href={routes.request(r.id)}
+                    title={r.title}
+                    status={String(r.status)}
                     kind="request"
-                    kindLabel={
-                      String(row.data.status).toLowerCase() === 'draft' ? 'Draft' : 'Request'
-                    }
+                    kindLabel={String(r.status).toLowerCase() === 'draft' ? 'Draft' : 'Request'}
                     meta={[
-                      row.data.category
-                        ? formatRequestCategory(String(row.data.category))
-                        : 'Service request',
-                      row.data.createdAt
-                        ? new Date(row.data.createdAt).toLocaleDateString(undefined, {
+                      r.category ? formatRequestCategory(String(r.category)) : 'Service request',
+                      r.createdAt
+                        ? new Date(r.createdAt).toLocaleDateString(undefined, {
                             dateStyle: 'medium',
                           })
                         : '—',
@@ -295,18 +329,21 @@ export function RequestsListClient() {
                     icon={Send}
                     iconVariant="warning"
                   />
-                ) : (
+                ))
+              : null}
+            {view === 'projects'
+              ? filteredProjects.map((p) => (
                   <WorkListItem
-                    key={`proj-${row.id}`}
-                    href={routes.project(row.id)}
-                    title={row.data.title}
-                    status={String(row.data.status)}
+                    key={p.id}
+                    href={routes.project(p.id)}
+                    title={p.title}
+                    status={String(p.status)}
                     kind="project"
                     kindLabel="Project"
                     meta={[
-                      formatWorkStatusLabel(String(row.data.status)),
-                      row.data.createdAt
-                        ? new Date(row.data.createdAt).toLocaleDateString(undefined, {
+                      formatWorkStatusLabel(String(p.status)),
+                      p.createdAt
+                        ? new Date(p.createdAt).toLocaleDateString(undefined, {
                             dateStyle: 'medium',
                           })
                         : '—',
@@ -314,51 +351,11 @@ export function RequestsListClient() {
                     icon={FolderKanban}
                     iconVariant="success"
                   />
-                )
-              )
-            : null}
-          {view === 'requests'
-            ? filteredRequests.map((r) => (
-                <WorkListItem
-                  key={r.id}
-                  href={routes.request(r.id)}
-                  title={r.title}
-                  status={String(r.status)}
-                  kind="request"
-                  kindLabel={String(r.status).toLowerCase() === 'draft' ? 'Draft' : 'Request'}
-                  meta={[
-                    r.category ? formatRequestCategory(String(r.category)) : 'Service request',
-                    r.createdAt
-                      ? new Date(r.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })
-                      : '—',
-                  ]}
-                  icon={Send}
-                  iconVariant="warning"
-                />
-              ))
-            : null}
-          {view === 'projects'
-            ? filteredProjects.map((p) => (
-                <WorkListItem
-                  key={p.id}
-                  href={routes.project(p.id)}
-                  title={p.title}
-                  status={String(p.status)}
-                  kind="project"
-                  kindLabel="Project"
-                  meta={[
-                    formatWorkStatusLabel(String(p.status)),
-                    p.createdAt
-                      ? new Date(p.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })
-                      : '—',
-                  ]}
-                  icon={FolderKanban}
-                  iconVariant="success"
-                />
-              ))
-            : null}
-        </WorkListShell>
-      ) : null}
+                ))
+              : null}
+          </>
+        ) : null}
+      </WorkListShell>
 
       {view === 'requests' && !isLoading && !isError && total > 0 ? (
         <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />

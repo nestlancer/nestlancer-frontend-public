@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowRight,
@@ -11,7 +11,6 @@ import {
   MessageSquare,
   Receipt,
   Send,
-  Sparkles,
 } from '@nestlancer/ui/icons';
 
 import { getApiErrorMessage, normalizeNotificationItem } from '@nestlancer/api-client';
@@ -32,7 +31,11 @@ import {
 } from '@/features/messaging/conversation-utils';
 import { canClientAcceptQuote, formatWorkStatusLabel } from '@/features/work/status-utils';
 import { apiServices } from '@/lib/axios';
-import { webPrimaryButtonClass } from '@/lib/tailadmin-classes';
+import {
+  webListShellClass,
+  webMetricStripClass,
+  webPrimaryButtonClass,
+} from '@/lib/tailadmin-classes';
 import {
   activityLogToRows,
   mergeActivity,
@@ -282,144 +285,131 @@ export function DashboardOverview() {
     projectsQ.isPending ||
     conversationsQ.isPending;
 
+  type WorkbenchTab = 'quotes' | 'payments' | 'projects' | 'inbox';
+  const [workbenchTab, setWorkbenchTab] = useState<WorkbenchTab>('quotes');
+  const workbenchTabs: { id: WorkbenchTab; label: string; count: number }[] = [
+    { id: 'quotes', label: 'Quotes', count: quoteRows.length },
+    { id: 'payments', label: 'Pay now', count: paymentRows.length },
+    { id: 'projects', label: 'Projects', count: projectRows.length },
+    { id: 'inbox', label: 'Inbox', count: inboxRows.length },
+  ];
+
   return (
     <div className="space-y-4">
-      {/* Compact hero */}
-      <section
-        className={cn(
-          'relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm',
-          'dark:border-gray-800 dark:bg-white/[0.03] dark:shadow-none',
-          'animate-fade-in-up motion-reduce:animate-none'
-        )}
-      >
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(20,184,166,0.14),transparent_55%),radial-gradient(ellipse_at_bottom_right,rgba(14,165,233,0.07),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(45,212,191,0.16),transparent_55%),radial-gradient(ellipse_at_bottom_right,rgba(56,189,248,0.07),transparent_50%)]"
-          aria-hidden
-        />
-        <div className="relative grid gap-4 p-4 md:grid-cols-[1.35fr_1fr] md:p-5">
-          <div>
-            <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-ta-brand-600 dark:text-ta-brand-400">
-              <Sparkles className="h-3.5 w-3.5" aria-hidden />
-              Client portal
-              <span className="ml-1 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-emerald-700 dark:text-emerald-300">
-                Live
-              </span>
+      {/* Job header — no banking “Welcome back” billboard */}
+      <section className="animate-fade-in-up motion-reduce:animate-none">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              {greetingReady && name ? name : 'Workspace'}
             </p>
-            <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
-              {greetingReady ? (
-                <>Welcome back, {name}</>
-              ) : (
-                <span className="inline-flex items-center gap-2">
-                  Welcome back
-                  <Skeleton className="h-7 w-36 rounded-md" aria-hidden />
-                  <span className="sr-only">Loading your name</span>
-                </span>
-              )}
+            <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+              Overview
             </h1>
-            <p className="mt-1 max-w-lg text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               {primaryAlert
                 ? 'One action will unblock your workspace.'
-                : 'Your projects, quotes, and billing stay in sync.'}
+                : 'Quotes, projects, and billing — what needs you next.'}
             </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {primaryAlert ? (
-                <Button asChild size="sm" className={webPrimaryButtonClass}>
-                  <Link href={primaryAlert.href}>
-                    {primaryAlert.label}
-                    <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
-                  </Link>
-                </Button>
-              ) : (
-                <Button asChild size="sm" className={webPrimaryButtonClass}>
-                  <Link href={routes.requestNew}>
-                    Start a request
-                    <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
-                  </Link>
-                </Button>
-              )}
-              <Button asChild size="sm" variant="outline">
-                <Link href={routes.projects}>View projects</Link>
-              </Button>
-            </div>
           </div>
-
-          <div className="rounded-xl border border-gray-200/80 bg-white/80 p-4 backdrop-blur-sm dark:border-white/10 dark:bg-black/20">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400">
-              Total invoiced
-            </p>
-            <p
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            {primaryAlert ? (
+              <Button asChild size="sm" className={cn(webPrimaryButtonClass, 'w-full sm:w-auto')}>
+                <Link href={primaryAlert.href}>
+                  {primaryAlert.label}
+                  <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild size="sm" className={cn(webPrimaryButtonClass, 'w-full sm:w-auto')}>
+                <Link href={routes.requestNew}>
+                  Start a request
+                  <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
+                </Link>
+              </Button>
+            )}
+            <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+              <Link href={routes.projects}>Projects</Link>
+            </Button>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-y border-border/70 py-2 text-xs">
+          <p className="text-muted-foreground">
+            <span className="font-medium text-foreground">Invoiced</span>
+            <span
               className={cn(
-                'mt-1 font-display text-2xl font-bold tabular-nums tracking-tight text-gray-900 dark:text-white sm:text-3xl',
+                'ml-2 font-semibold tabular-nums tracking-tight text-foreground',
                 moneyHero === '…' && 'animate-pulse'
               )}
             >
               {moneyHero}
-            </p>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            </span>
+            <span className="ml-2">
               {summaryPending
-                ? 'Loading billing…'
-                : `${formatMoneyFromPaise(payments?.pending ?? 0, 'INR', 'en-IN')} pending`}
-            </p>
-            <div className="mt-3">
-              <Button asChild size="sm" variant="outline" className="w-full">
-                <Link href={routes.payments}>View billing history</Link>
-              </Button>
-            </div>
-          </div>
+                ? '· Loading…'
+                : `· ${formatMoneyFromPaise(payments?.pending ?? 0, 'INR', 'en-IN')} pending`}
+            </span>
+          </p>
+          <Link
+            href={routes.payments}
+            className="font-medium text-ta-brand-600 hover:text-ta-brand-700 dark:text-ta-brand-400"
+          >
+            Billing history
+          </Link>
         </div>
       </section>
 
-      {/* Compact single-row vitals */}
-      <section aria-labelledby="dashboard-kpis">
-        <div className="mb-2 flex items-end justify-between gap-3">
+      {/* Workspace vitals — single strip (not 5 chubby cards) */}
+      <section aria-labelledby="dashboard-kpis" className="space-y-1.5">
+        <div className="flex items-end justify-between gap-3 px-0.5">
           <h2
             id="dashboard-kpis"
             className="text-sm font-semibold text-gray-800 dark:text-white/90"
           >
             Workspace vitals
           </h2>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400">Refreshes every 30s</p>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">Live · 30s</p>
         </div>
-        <div className="grid gap-3 grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+        <div className={webMetricStripClass}>
           <DashboardMetricCard
-            compact
+            strip
             label="Open requests"
             value={summaryError ? '—' : summaryPending ? '…' : fmt(openReq ?? 0)}
             hint="In your pipeline"
-            icon={<Send className="h-4 w-4" aria-hidden />}
+            icon={<Send aria-hidden />}
             href={routes.requests}
           />
           <DashboardMetricCard
-            compact
+            strip
             label="Active projects"
             value={summaryError ? '—' : summaryPending ? '…' : fmt(projects?.active ?? 0)}
             hint={`${fmt(projects?.completed ?? 0)} completed`}
-            icon={<FolderKanban className="h-4 w-4" aria-hidden />}
+            icon={<FolderKanban aria-hidden />}
             href={routes.projects}
           />
           <DashboardMetricCard
-            compact
+            strip
             label="Pending quotes"
             value={summaryError ? '—' : summaryPending ? '…' : fmt(requests?.pendingQuotes ?? 0)}
             hint="Awaiting your decision"
-            icon={<Receipt className="h-4 w-4" aria-hidden />}
+            icon={<Receipt aria-hidden />}
             href={routes.quotes}
           />
           <DashboardMetricCard
-            compact
+            strip
             label="Unread messages"
             value={summaryError ? '—' : summaryPending ? '…' : fmt(messages?.totalUnread ?? 0)}
             hint="Messages waiting for you"
-            icon={<MessageSquare className="h-4 w-4" aria-hidden />}
+            icon={<MessageSquare aria-hidden />}
             href={routes.messages}
           />
           <DashboardMetricCard
-            compact
-            className="col-span-2 md:col-span-1"
+            strip
+            className="sm:col-span-2 md:col-span-1 xl:col-span-1"
             label="Notifications"
             value={summaryError ? '—' : summaryPending ? '…' : fmt(notificationsUnread)}
             hint="Latest updates"
-            icon={<Bell className="h-4 w-4" aria-hidden />}
+            icon={<Bell aria-hidden />}
             href={routes.notifications}
           />
         </div>
@@ -450,11 +440,11 @@ export function DashboardOverview() {
           )}
         </div>
         <div className="xl:col-span-4">
-          <WebPanel padding="sm">
-            <h2 className="mb-2 text-sm font-semibold text-gray-800 dark:text-white/90">
+          <WebPanel padding="none" className="overflow-hidden">
+            <h2 className="border-b border-gray-100 px-3.5 py-2.5 text-sm font-semibold text-gray-800 dark:border-gray-800 dark:text-white/90">
               Awaiting you
             </h2>
-            <ul className="space-y-1.5">
+            <ul className="divide-y divide-gray-100 dark:divide-gray-800">
               {[
                 {
                   show: (payments?.pending ?? 0) > 0,
@@ -495,11 +485,12 @@ export function DashboardOverview() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="flex items-center gap-2 rounded-lg border border-amber-200/70 bg-amber-50/50 px-2.5 py-2 transition-colors hover:border-ta-brand-500/30 hover:bg-ta-brand-50/50 dark:border-amber-500/20 dark:bg-amber-500/10 dark:hover:bg-ta-brand-500/10"
+                      className="flex items-center gap-2.5 px-3.5 py-2.5 transition-colors hover:bg-ta-brand-50/40 dark:hover:bg-ta-brand-500/[0.06]"
                     >
-                      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white text-amber-700 shadow-sm dark:bg-black/20 dark:text-amber-200">
-                        <Icon className="h-3.5 w-3.5" aria-hidden />
-                      </span>
+                      <Icon
+                        className="h-3.5 w-3.5 shrink-0 text-ta-brand-600 dark:text-ta-brand-400"
+                        aria-hidden
+                      />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium text-gray-800 dark:text-white/90">
                           {label}
@@ -517,14 +508,14 @@ export function DashboardOverview() {
               (requests?.pendingQuotes ?? 0) <= 0 &&
               (messages?.totalUnread ?? 0) <= 0 &&
               notificationsUnread <= 0 ? (
-                <li className="rounded-lg border border-emerald-200/70 bg-emerald-50/60 px-3 py-2.5 text-xs text-emerald-900 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-100">
+                <li className="px-3.5 py-3 text-xs text-gray-500 dark:text-gray-400">
                   You’re all caught up.
                 </li>
               ) : null}
               {summaryPending
                 ? Array.from({ length: 2 }).map((_, i) => (
-                    <li key={`await-skel-${i}`}>
-                      <Skeleton className="h-11 w-full rounded-lg" />
+                    <li key={`await-skel-${i}`} className="px-3.5 py-2.5">
+                      <Skeleton className="h-8 w-full rounded-md" />
                     </li>
                   ))
                 : null}
@@ -533,60 +524,94 @@ export function DashboardOverview() {
         </div>
       </div>
 
-      {/* Live workbench — real list data */}
+      {/* Live workbench — single tabbed shell (not 4-card grid) */}
       <section aria-labelledby="dashboard-live" className="space-y-2">
         <div className="flex items-end justify-between gap-3">
-          <h2
-            id="dashboard-live"
-            className="text-sm font-semibold text-gray-800 dark:text-white/90"
-          >
+          <h2 id="dashboard-live" className="text-sm font-semibold text-foreground">
             Live workbench
           </h2>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400">
-            Quotes · payments · projects · inbox
-          </p>
+          <p className="text-[11px] text-muted-foreground">One queue at a time</p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <DashboardLivePanel
-            title="Quotes to review"
-            href={routes.quotes}
-            icon={<Receipt className="h-3.5 w-3.5" aria-hidden />}
-            rows={quoteRows}
-            loading={livePending && !quotesQ.data}
-            emptyTitle="No quotes waiting"
-            emptyDescription="New quotes appear here when sent."
-            maxRows={3}
-          />
-          <DashboardLivePanel
-            title="Pay now"
-            href={routes.payments}
-            icon={<CreditCard className="h-3.5 w-3.5" aria-hidden />}
-            rows={paymentRows}
-            loading={livePending && !pendingPaymentsQ.data}
-            emptyTitle="Nothing due"
-            emptyDescription="Pending invoices show up here."
-            maxRows={6}
-          />
-          <DashboardLivePanel
-            title="Active projects"
-            href={routes.projects}
-            icon={<FolderKanban className="h-3.5 w-3.5" aria-hidden />}
-            rows={projectRows}
-            loading={livePending && !projectsQ.data}
-            emptyTitle="No active projects"
-            emptyDescription="Accepted work lands here."
-            maxRows={3}
-          />
-          <DashboardLivePanel
-            title="Inbox"
-            href={routes.messages}
-            icon={<MessageSquare className="h-3.5 w-3.5" aria-hidden />}
-            rows={inboxRows}
-            loading={livePending && !conversationsQ.data}
-            emptyTitle="Inbox clear"
-            emptyDescription="Latest conversations appear here."
-            maxRows={3}
-          />
+        <div className={cn(webListShellClass, 'overflow-hidden')}>
+          <div
+            role="tablist"
+            aria-label="Workbench queues"
+            className="flex gap-0.5 overflow-x-auto border-b border-border/70 px-1.5 pt-1.5"
+          >
+            {workbenchTabs.map((tab) => {
+              const selected = workbenchTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setWorkbenchTab(tab.id)}
+                  className={cn(
+                    'shrink-0 rounded-t-md px-3 py-2 text-[13px] font-medium transition-colors',
+                    selected
+                      ? 'bg-background text-ta-brand-700 shadow-[inset_0_-2px_0_0] shadow-ta-brand-500 dark:text-ta-brand-300'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {tab.label}
+                  <span className="ml-1.5 tabular-nums text-[11px] opacity-70">{tab.count}</span>
+                </button>
+              );
+            })}
+          </div>
+          {workbenchTab === 'quotes' ? (
+            <DashboardLivePanel
+              title="Quotes to review"
+              href={routes.quotes}
+              icon={<Receipt className="h-3.5 w-3.5" aria-hidden />}
+              rows={quoteRows}
+              loading={livePending && !quotesQ.data}
+              emptyTitle="No quotes waiting"
+              emptyDescription="New quotes appear here when sent."
+              maxRows={6}
+              className="border-0 shadow-none"
+            />
+          ) : null}
+          {workbenchTab === 'payments' ? (
+            <DashboardLivePanel
+              title="Pay now"
+              href={routes.payments}
+              icon={<CreditCard className="h-3.5 w-3.5" aria-hidden />}
+              rows={paymentRows}
+              loading={livePending && !pendingPaymentsQ.data}
+              emptyTitle="Nothing due"
+              emptyDescription="Pending invoices show up here."
+              maxRows={8}
+              className="border-0 shadow-none"
+            />
+          ) : null}
+          {workbenchTab === 'projects' ? (
+            <DashboardLivePanel
+              title="Active projects"
+              href={routes.projects}
+              icon={<FolderKanban className="h-3.5 w-3.5" aria-hidden />}
+              rows={projectRows}
+              loading={livePending && !projectsQ.data}
+              emptyTitle="No active projects"
+              emptyDescription="Accepted work lands here."
+              maxRows={6}
+              className="border-0 shadow-none"
+            />
+          ) : null}
+          {workbenchTab === 'inbox' ? (
+            <DashboardLivePanel
+              title="Inbox"
+              href={routes.messages}
+              icon={<MessageSquare className="h-3.5 w-3.5" aria-hidden />}
+              rows={inboxRows}
+              loading={livePending && !conversationsQ.data}
+              emptyTitle="Inbox clear"
+              emptyDescription="Latest conversations appear here."
+              maxRows={6}
+              className="border-0 shadow-none"
+            />
+          ) : null}
         </div>
       </section>
 

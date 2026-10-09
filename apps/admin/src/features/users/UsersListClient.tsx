@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -51,6 +52,7 @@ function avatarStatus(row: UserRow): 'active' | 'suspended' | 'neutral' {
 }
 
 export function UsersListClient() {
+  const router = useRouter();
   const qc = useQueryClient();
   const { confirm } = useAdminConfirm();
   const [q, setQ] = useState('');
@@ -163,6 +165,7 @@ export function UsersListClient() {
             type="checkbox"
             aria-label="Select all users"
             checked={rows.length > 0 && rows.every((r) => selected.has(rowId(r)))}
+            onClick={(e) => e.stopPropagation()}
             onChange={(e) => {
               if (e.target.checked) {
                 setSelected(new Set(rows.map((r) => rowId(r)).filter(Boolean)));
@@ -179,6 +182,7 @@ export function UsersListClient() {
             <input
               type="checkbox"
               checked={selected.has(id)}
+              onClick={(e) => e.stopPropagation()}
               onChange={() => toggleRow(id)}
               aria-label={`Select ${String(row.email ?? id)}`}
             />
@@ -284,18 +288,24 @@ export function UsersListClient() {
         title="Users directory"
         description="Manage system access, roles, and security status for all internal and client accounts."
         actions={
-          <Button
-            size="sm"
-            variant="outline"
-            disabled
-            title="User creation is via client registration"
-          >
-            Add new user
-          </Button>
+          <div className="flex max-w-xs flex-col items-end gap-1">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled
+              aria-disabled="true"
+              title="User creation is via client registration"
+            >
+              Add new user
+            </Button>
+            <p className="text-right text-[11px] leading-snug text-muted-foreground">
+              New accounts come from client registration — operators cannot create users here.
+            </p>
+          </div>
         }
       />
 
-      <AdminMetricStrip items={kpiItems} max={4} />
+      <AdminMetricStrip items={kpiItems} max={4} dense />
 
       <AdminDataShell
         filter={
@@ -440,6 +450,10 @@ export function UsersListClient() {
                 row.lastName ?? ''
               )}`
             }
+            onRowClick={(row) => {
+              const id = rowId(row);
+              if (id) router.push(`/users/${encodeURIComponent(id)}`);
+            }}
             emptyTitle="No users match your filters"
             emptyDescription="Try adjusting filters or clearing search terms."
           />

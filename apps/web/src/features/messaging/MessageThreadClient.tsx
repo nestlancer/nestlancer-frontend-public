@@ -68,7 +68,7 @@ export function MessageThreadClient({
     () => getAccessToken() ?? undefined
   );
   const markedReadRef = useRef(false);
-  const { uploadAsync, isUploading } = useMediaUpload();
+  const { uploadAsync, isUploading } = useMediaUpload({ successToast: false });
 
   useEffect(() => {
     setAccessToken(getAccessToken() ?? undefined);
@@ -303,16 +303,21 @@ export function MessageThreadClient({
             }
             onCancelReply={() => setReplyToId(null)}
             onSendFile={async (file, caption) => {
-              const result = await uploadAsync({ file, projectId });
-              await apiServices.messaging.sendProjectMessage(projectId, {
-                mediaId: result.mediaId,
-                type: 'FILE',
-                ...(caption ? { content: caption } : {}),
-                ...(replyToId ? { replyToId } : {}),
-              });
-              setReplyToId(null);
-              void qc.invalidateQueries({ queryKey: queryKeys.messages.thread(projectId) });
-              void qc.invalidateQueries({ queryKey: queryKeys.messages.conversations });
+              try {
+                const result = await uploadAsync({ file, projectId });
+                await apiServices.messaging.sendProjectMessage(projectId, {
+                  mediaId: result.mediaId,
+                  type: 'FILE',
+                  ...(caption ? { content: caption } : {}),
+                  ...(replyToId ? { replyToId } : {}),
+                });
+                setReplyToId(null);
+                void qc.invalidateQueries({ queryKey: queryKeys.messages.thread(projectId) });
+                void qc.invalidateQueries({ queryKey: queryKeys.messages.conversations });
+                toast.success('File sent');
+              } catch (e) {
+                toast.error(getApiErrorMessage(e, 'Could not send file'));
+              }
             }}
           />
         }

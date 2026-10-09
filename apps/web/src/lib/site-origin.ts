@@ -49,32 +49,67 @@ export function getSiteOrigin(): string {
  * When the request Host is a public Nestlancer marketing host, always target the
  * production (or matching) app host — never localhost.
  */
+/** NL-BV-F4-01: only literal http/https — reject `https://evil.com` proto injection. */
+function normalizeForwardedProto(
+  raw: string | null | undefined,
+  fallback: 'http' | 'https'
+): 'http' | 'https' {
+  const proto = (raw ?? '').split(',')[0]?.trim().toLowerCase() || '';
+  return proto === 'http' || proto === 'https' ? proto : fallback;
+}
+
+/** Hostname (+ optional port) from Host / X-Forwarded-Host — no suffix tricks. */
+function parseForwardedHost(raw: string | null | undefined): { hostname: string; port: string } {
+  const host = (raw ?? '').split(',')[0]?.trim().toLowerCase() || '';
+  if (!host) return { hostname: '', port: '' };
+  if (host.startsWith('[')) {
+    const end = host.indexOf(']');
+    if (end === -1) return { hostname: '', port: '' };
+    const hostname = host.slice(1, end);
+    const rest = host.slice(end + 1);
+    const port = rest.startsWith(':') ? rest.slice(1) : '';
+    return { hostname, port };
+  }
+  const colon = host.lastIndexOf(':');
+  if (colon > -1 && host.indexOf(':') === colon) {
+    return { hostname: host.slice(0, colon), port: host.slice(colon + 1) };
+  }
+  return { hostname: host, port: '' };
+}
+
+function isLoopbackHostname(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+}
+
 export function resolveWebAppOriginFromHost(input: {
   host?: string | null;
   proto?: string | null;
 }): string {
-  const host = (input.host ?? '').split(',')[0]?.trim().toLowerCase() || '';
-  const proto =
-    (input.proto || (host.includes('localhost') || host.startsWith('127.') ? 'http' : 'https'))
-      .split(',')[0]
-      ?.trim()
-      .toLowerCase() || 'https';
+  const { hostname, port } = parseForwardedHost(input.host);
+  const loopback = isLoopbackHostname(hostname);
+  const proto = normalizeForwardedProto(input.proto, loopback ? 'http' : 'https');
 
   if (
-    host === 'nestlancer.com' ||
-    host === 'www.nestlancer.com' ||
-    host === 'landing.nestlancer.com'
+    hostname === 'nestlancer.com' ||
+    hostname === 'www.nestlancer.com' ||
+    hostname === 'landing.nestlancer.com'
   ) {
     return 'https://app.nestlancer.com';
   }
 
-  if (host.startsWith('dev-landing.') || host === 'dev-landing.nestlancer.com') {
+  if (
+    hostname === 'dev-landing.nestlancer.com' ||
+    hostname.endsWith('.dev-landing.nestlancer.com')
+  ) {
+    return 'https://dev-app.nestlancer.com';
+  }
+  if (hostname.startsWith('dev-landing.') && hostname.endsWith('.nestlancer.com')) {
     return 'https://dev-app.nestlancer.com';
   }
 
-  if (host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
+  if (loopback) {
     // Local landing (:9020 / :9120) → local web (:9000 / :9100 via compose publish)
-    if (host.endsWith(':9020') || host.endsWith(':9120')) {
+    if (port === '9020' || port === '9120') {
       return `${proto}://localhost:9000`;
     }
     const runtime = runtimeAppOrigin();

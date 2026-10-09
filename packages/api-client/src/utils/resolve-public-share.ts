@@ -55,6 +55,7 @@ export async function resolvePublicShare(
   const res = await fetch(url, {
     method: hasPassword ? 'POST' : 'GET',
     credentials: 'omit',
+    cache: 'no-store',
     headers: hasPassword ? { 'Content-Type': 'application/json' } : undefined,
     body: hasPassword ? JSON.stringify({ password: options!.password }) : undefined,
   });

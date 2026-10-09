@@ -108,6 +108,9 @@ importers:
       next:
         specifier: ^14.2.18
         version: 14.2.35(@playwright/test@1.59.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      qrcode:
+        specifier: ^1.5.4
+        version: 1.5.4
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -136,6 +139,9 @@ importers:
       '@types/node':
         specifier: ^20.17.0
         version: 20.19.40
+      '@types/qrcode':
+        specifier: ^1.5.5
+        version: 1.5.6
       '@types/react':
         specifier: ^18.3.12
         version: 18.3.28

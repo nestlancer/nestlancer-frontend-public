@@ -389,23 +389,24 @@ export function ModerationClient() {
                     return (
                       <article
                         key={id || searchableText(row)}
-                        className={cn(adminCardClass, 'space-y-4 p-4 sm:p-5')}
+                        className={cn(adminCardClass, 'space-y-3 !p-3.5')}
                       >
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <StatusPill tone={status === 'escalated' ? 'bad' : 'warn'}>
                               {status === 'escalated' ? 'Escalated' : 'Flagged'}
                             </StatusPill>
-                            <StatusPill tone="neutral">{chatKindLabel(kind)}</StatusPill>
-                            <StatusPill tone="neutral">{messageTypeLabel(row)}</StatusPill>
+                            <span className="text-[11px] text-muted-foreground">
+                              {chatKindLabel(kind)} · {messageTypeLabel(row)}
+                            </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            Sent {formatDate(row.createdAt)}
+                          <p className="text-[11px] text-muted-foreground">
+                            {formatDate(row.createdAt)}
                           </p>
                         </div>
 
-                        <div className="rounded-md border border-border/70 bg-muted/30 px-3 py-3">
-                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                        <div className="border-l-2 border-primary/40 bg-transparent py-0.5 pl-3">
+                          <p className="whitespace-pre-wrap text-sm font-medium leading-relaxed text-foreground">
                             {messageBody(row) || '—'}
                           </p>
                         </div>

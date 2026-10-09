@@ -7,7 +7,7 @@ import { analyticsEvents } from '@nestlancer/constants';
 import { paymentIntentSchema } from '@nestlancer/validators';
 
 import { getApiErrorCode, getApiErrorMessage } from '@nestlancer/api-client';
-import { hasTokens, trySilentRefresh, useAuth } from '@nestlancer/auth';
+import { getAccessTokenExpiresAt, hasTokens, trySilentRefresh, useAuth } from '@nestlancer/auth';
 
 import { apiServices } from '@/lib/axios';
 import { trackEvent } from '@/lib/telemetry';
@@ -51,8 +51,13 @@ async function resolveCheckoutContact(
 }
 
 async function ensureCheckoutAuth(): Promise<void> {
-  if (!hasTokens()) {
-    await trySilentRefresh();
+  const expiresAt = getAccessTokenExpiresAt();
+  const nearExpiry = expiresAt != null && Date.now() >= expiresAt - 60_000;
+  if (!hasTokens() || nearExpiry) {
+    const ok = await trySilentRefresh();
+    if (!ok && !hasTokens()) {
+      throw new Error('Session expired — sign in again to pay.');
+    }
   }
 }
 
@@ -131,6 +136,9 @@ export function usePaymentCheckout(options?: { onSuccess?: () => void }) {
           toast.error(parsedIntent.error.issues[0]?.message ?? 'Invalid payment amount.');
           throw new Error('Invalid payment intent');
         }
+
+        await ensureCheckoutAuth();
+
         const intent = await apiServices.payments.createIntent({
           projectId: params.projectId,
           milestoneId: params.milestoneId,
@@ -171,8 +179,6 @@ export function usePaymentCheckout(options?: { onSuccess?: () => void }) {
           );
           throw new Error('Missing checkout contact phone');
         }
-
-        await ensureCheckoutAuth();
 
         await new Promise<void>((resolve, reject) => {
           const rzpOptions = buildRazorpayCheckoutOptions({

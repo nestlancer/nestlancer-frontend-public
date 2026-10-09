@@ -6,6 +6,7 @@ export * from './auth-log';
 export * from './bff';
 export * from './bff-gateway-login';
 export * from './middleware';
+export * from './portalRoleGate';
 export * from './sessionEvents';
 export * from './silentRefresh';
 export * from './tokenManager';

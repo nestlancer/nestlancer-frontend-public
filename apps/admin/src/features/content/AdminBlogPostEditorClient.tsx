@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from '@nestlancer/ui';
@@ -41,6 +41,17 @@ function parseCategories(raw: unknown): { id: string; name: string }[] {
 export function AdminBlogPostEditorClient({ postId }: Props) {
   const router = useRouter();
   const isEditing = Boolean(postId);
+  const fieldIds = {
+    title: useId(),
+    excerpt: useId(),
+    content: useId(),
+    category: useId(),
+    slug: useId(),
+    tags: useId(),
+    status: useId(),
+    metaTitle: useId(),
+    metaDescription: useId(),
+  };
 
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
@@ -187,10 +198,16 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
       <AdminSection title="Settings">
         <div className="space-y-4">
           <div>
-            <FormFieldLabel fieldKey="blog.category" label="Category" required>
+            <FormFieldLabel
+              fieldKey="blog.category"
+              label="Category"
+              required
+              htmlFor={fieldIds.category}
+            >
               Category
             </FormFieldLabel>
             <select
+              id={fieldIds.category}
               value={categoryId}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setCategoryId(e.target.value)}
               disabled={categoriesQ.isLoading || categories.length === 0}
@@ -208,10 +225,11 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
             </select>
           </div>
           <div>
-            <FormFieldLabel fieldKey="blog.slug" label="Slug">
+            <FormFieldLabel fieldKey="blog.slug" label="Slug" htmlFor={fieldIds.slug}>
               Slug
             </FormFieldLabel>
             <Input
+              id={fieldIds.slug}
               value={slug}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSlug(e.target.value)}
               className="rounded-lg"
@@ -219,10 +237,11 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
             />
           </div>
           <div>
-            <FormFieldLabel fieldKey="blog.tags" label="Tags">
+            <FormFieldLabel fieldKey="blog.tags" label="Tags" htmlFor={fieldIds.tags}>
               Tags (comma-separated)
             </FormFieldLabel>
             <Input
+              id={fieldIds.tags}
               value={tags}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTags(e.target.value)}
               className="rounded-lg"
@@ -231,10 +250,11 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
           </div>
           {isEditing ? (
             <div>
-              <FormFieldLabel fieldKey="blog.status" label="Status">
+              <FormFieldLabel fieldKey="blog.status" label="Status" htmlFor={fieldIds.status}>
                 Status
               </FormFieldLabel>
               <select
+                id={fieldIds.status}
                 value={status}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatus(e.target.value)}
                 className="w-full rounded-lg border border-border/70 bg-background/80 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
@@ -251,10 +271,15 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
       <AdminSection title="SEO & discovery">
         <div className="space-y-4">
           <div>
-            <FormFieldLabel fieldKey="blog.seoTitle" label="Meta title">
+            <FormFieldLabel
+              fieldKey="blog.seoTitle"
+              label="Meta title"
+              htmlFor={fieldIds.metaTitle}
+            >
               Meta title
             </FormFieldLabel>
             <Input
+              id={fieldIds.metaTitle}
               value={metaTitle}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMetaTitle(e.target.value)}
               className="rounded-lg"
@@ -262,10 +287,15 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
             />
           </div>
           <div>
-            <FormFieldLabel fieldKey="blog.seoDescription" label="Meta description">
+            <FormFieldLabel
+              fieldKey="blog.seoDescription"
+              label="Meta description"
+              htmlFor={fieldIds.metaDescription}
+            >
               Meta description
             </FormFieldLabel>
             <textarea
+              id={fieldIds.metaDescription}
               value={metaDescription}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setMetaDescription(e.target.value)
@@ -434,10 +464,16 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
                 <AdminSection title="Post content">
                   <div className="space-y-4">
                     <div>
-                      <FormFieldLabel fieldKey="blog.title" label="Title" required>
+                      <FormFieldLabel
+                        fieldKey="blog.title"
+                        label="Title"
+                        required
+                        htmlFor={fieldIds.title}
+                      >
                         Title
                       </FormFieldLabel>
                       <Input
+                        id={fieldIds.title}
                         value={title}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setTitle(e.target.value)
@@ -447,10 +483,15 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
                       />
                     </div>
                     <div>
-                      <FormFieldLabel fieldKey="blog.excerpt" label="Excerpt">
+                      <FormFieldLabel
+                        fieldKey="blog.excerpt"
+                        label="Excerpt"
+                        htmlFor={fieldIds.excerpt}
+                      >
                         Excerpt
                       </FormFieldLabel>
                       <textarea
+                        id={fieldIds.excerpt}
                         value={excerpt}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                           setExcerpt(e.target.value)
@@ -460,10 +501,15 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
                       />
                     </div>
                     <div>
-                      <FormFieldLabel fieldKey="blog.content" label="Content">
+                      <FormFieldLabel
+                        fieldKey="blog.content"
+                        label="Content"
+                        htmlFor={fieldIds.content}
+                      >
                         Content (Markdown)
                       </FormFieldLabel>
                       <textarea
+                        id={fieldIds.content}
                         value={content}
                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                           setContent(e.target.value)
@@ -520,6 +566,20 @@ export function AdminBlogPostEditorClient({ postId }: Props) {
               {settingsCards}
             </div>
           ) : null}
+
+          <div className="h-16" aria-hidden />
+          <div className="sticky bottom-0 z-20 -mx-4 flex flex-wrap items-center justify-end gap-2 border-t border-border bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+            <Button variant="outline" className="rounded-lg" asChild>
+              <Link href="/content">Cancel</Link>
+            </Button>
+            <Button
+              className="rounded-lg"
+              disabled={isBusy || !title.trim() || !categoryId}
+              onClick={() => (isEditing ? updateM.mutate() : createM.mutate())}
+            >
+              {isBusy ? 'Saving…' : isEditing ? 'Save changes' : 'Create post'}
+            </Button>
+          </div>
         </>
       )}
     </div>

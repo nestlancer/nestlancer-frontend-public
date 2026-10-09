@@ -55,7 +55,7 @@ export function getMessagingSocket(wsUrl: string, token?: string, socketPath?: s
     // Marker only — JWT stays in `auth` (NL-BUG-PAY-003). Engine.IO allowRequest
     // accepts auth=1 or access_token cookie; middleware validates auth.token.
     query: token ? { auth: '1' } : undefined,
-    withCredentials: true,
+    withCredentials: false,
     autoConnect: true,
     reconnection: true,
     reconnectionAttempts: 12,

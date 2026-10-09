@@ -3,7 +3,7 @@
 > Nestlancer — Your dedicated product studio.
 > Site: https://nestlancer.com
 > Client portal: https://app.nestlancer.com
-> Contact: hello@nestlancer.com
+> Contact: contact@nestlancer.com
 
 ## Positioning
 
@@ -92,7 +92,7 @@ Public marketing site and portals are built with modern web stack conventions us
 
 ## Contacts
 
-- Studio email: hello@nestlancer.com
+- Studio email: contact@nestlancer.com
 - Typical reply: within one business day, IST
 - Contact handoff: https://nestlancer.com/contact → secure form on the app host
 

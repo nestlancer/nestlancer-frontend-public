@@ -558,20 +558,23 @@ export function BlogPostInteractionsClient({
           ) : null}
 
           <div className="mt-5 space-y-2">
-            <FormFieldLabel fieldKey="blog.commentBody" label="Comment">
+            <FormFieldLabel htmlFor="blog-comment-body" fieldKey="blog.commentBody" label="Comment">
               Comment
             </FormFieldLabel>
             <textarea
+              id="blog-comment-body"
               value={commentText}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setCommentText(e.target.value)
               }
               placeholder={isAuthenticated ? 'Write a comment…' : 'Sign in to write a comment…'}
+              aria-label={isAuthenticated ? 'Write a comment' : 'Sign in to write a comment'}
               className="min-h-[80px] w-full rounded-lg border border-border/70 bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
             <button
               type="button"
               disabled={!commentText.trim() || postCommentM.isPending}
+              title={!commentText.trim() ? 'Enter a comment to enable post' : undefined}
               className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
               onClick={handlePostComment}
             >

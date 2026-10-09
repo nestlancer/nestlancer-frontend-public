@@ -34,6 +34,28 @@ function sessionPayload(token: string) {
   };
 }
 
+/** NL-BV-F1-02: claim-shape alone is not enough — gateway must accept the Bearer JWT. */
+async function gatewayAcceptsAccessToken(token: string, incoming: Request): Promise<boolean> {
+  const headers = new Headers({ Authorization: `Bearer ${token}` });
+  applyCorrelationHeaders(
+    headers,
+    resolveCorrelationId({
+      headers: incoming.headers,
+      cookieHeader: incoming.headers.get('cookie') ?? undefined,
+    })
+  );
+  try {
+    const res = await fetch(`${getGatewayOrigin()}/api/v1/users/profile`, {
+      method: 'GET',
+      headers,
+      cache: 'no-store',
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 function applyImpersonationCookie(response: NextResponse, token: string, maxAge: number): void {
   clearHttpOnlyAuthCookies(response);
   response.cookies.set(IMPERSONATION_COOKIE, token, {
@@ -56,7 +78,7 @@ async function getHandler(request: Request) {
   }
 
   const session = sessionPayload(token);
-  if (!session) {
+  if (!session || !(await gatewayAcceptsAccessToken(session.accessToken, request))) {
     const response = NextResponse.json({ message: 'Support session expired' }, { status: 401 });
     clearHttpOnlyAuthCookies(response);
     return response;
@@ -79,7 +101,7 @@ async function postHandler(request: Request) {
   }
 
   const session = sessionPayload(accessToken);
-  if (!session) {
+  if (!session || !(await gatewayAcceptsAccessToken(session.accessToken, request))) {
     logAuthEvent({
       event: 'auth.impersonate',
       request,

@@ -17,7 +17,7 @@ import { SwitchRow } from '@/components/common/SwitchRow';
 import { useWebConfirm } from '@/components/web/WebConfirmProvider';
 import { WebPanel } from '@/components/web/WebPanel';
 import { apiServices } from '@/lib/axios';
-import { webPrimaryButtonClass } from '@/lib/tailadmin-classes';
+import { webPrimaryButtonClass, webStickyActionBarClass } from '@/lib/tailadmin-classes';
 import { asRecord } from '@/lib/client-api-view';
 
 type Digest = 'daily' | 'weekly' | 'never';
@@ -192,17 +192,25 @@ export function SettingsAccountClient() {
               onChange={(v) => setForm((f) => ({ ...f, privacy: { ...f.privacy, showPhone: v } }))}
             />
           </div>
-
-          <div className="mt-6 flex justify-end border-t border-gray-100 pt-4 dark:border-gray-800">
+        </WebPanel>
+        <div className="h-16" aria-hidden />
+        <div
+          className={cn(
+            webStickyActionBarClass,
+            'lg:left-[var(--sidebar-width,16rem)]',
+            'pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+          )}
+        >
+          <div className="mx-auto flex max-w-dashboard justify-end">
             <Button
               type="submit"
-              className={cn('h-11 rounded-xl px-6 font-semibold', webPrimaryButtonClass)}
+              className={cn('h-10 rounded-lg px-5 font-semibold', webPrimaryButtonClass)}
               disabled={save.isPending}
             >
               {save.isPending ? 'Saving…' : 'Save changes'}
             </Button>
           </div>
-        </WebPanel>
+        </div>
       </form>
 
       <AccountDangerZone />
@@ -249,7 +257,10 @@ function AccountDangerZone() {
   });
   const deleteM = useMutation({
     mutationFn: () => apiServices.users.requestAccountDeletion({ password }),
-    onSuccess: () => toast.success('Account deletion scheduled. Check your email to confirm.'),
+    onSuccess: () => {
+      setPassword('');
+      toast.success('Account deletion scheduled. Check your email to confirm.');
+    },
     onError: (e) => toast.error(getApiErrorMessage(e)),
   });
   const cancelM = useMutation({
@@ -263,7 +274,7 @@ function AccountDangerZone() {
       padding="lg"
       className="border-destructive/30 bg-destructive/[0.03] dark:bg-destructive/[0.06]"
     >
-      <h2 className="text-base font-semibold text-destructive">Danger zone</h2>
+      <h2 className="text-base font-semibold text-red-800 dark:text-red-300">Danger zone</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Export your data or permanently delete your account.
       </p>
@@ -325,34 +336,44 @@ function AccountDangerZone() {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Button
-              type="button"
-              variant="destructive"
-              className="rounded-xl"
-              disabled={!password || deleteM.isPending}
-              onClick={async () => {
-                if (
-                  await confirm({
-                    title: 'Delete your account?',
-                    description:
-                      'This cannot be undone easily. Your account deletion will be scheduled.',
-                    destructive: true,
-                  })
-                ) {
-                  deleteM.mutate();
-                }
-              }}
-            >
-              Delete account
-            </Button>
-            <button
-              type="button"
-              className="text-xs font-medium text-muted-foreground underline-offset-4 hover:underline"
-              disabled={cancelM.isPending}
-              onClick={() => cancelM.mutate()}
-            >
-              Cancel pending deletion
-            </button>
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="rounded-xl disabled:border-destructive/40 disabled:bg-destructive/15 disabled:text-red-900 disabled:opacity-100 dark:disabled:text-red-100"
+                  disabled={!password || deleteM.isPending}
+                  title={!password ? 'Enter your password to enable account deletion' : undefined}
+                  onClick={async () => {
+                    if (
+                      await confirm({
+                        title: 'Delete your account?',
+                        description:
+                          'This cannot be undone easily. Your account deletion will be scheduled.',
+                        destructive: true,
+                      })
+                    ) {
+                      deleteM.mutate();
+                    }
+                  }}
+                >
+                  Delete account
+                </Button>
+                <button
+                  type="button"
+                  className="text-xs font-medium text-muted-foreground underline-offset-4 hover:underline"
+                  disabled={cancelM.isPending}
+                  onClick={() => cancelM.mutate()}
+                >
+                  Cancel pending deletion
+                </button>
+              </div>
+              {!password ? (
+                <p className="text-xs text-muted-foreground">
+                  Enter your password above to enable account deletion.
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

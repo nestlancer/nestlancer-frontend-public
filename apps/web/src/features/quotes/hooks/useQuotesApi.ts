@@ -1,11 +1,11 @@
 'use client';
 
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+
 import {
   asPaginated,
   peelSuccessEnvelope,
   unwrapGatewayBody,
-  useQuotesQuotesControllerAcceptQuote,
-  useQuotesQuotesControllerDeclineQuote,
   useQuotesQuotesControllerGetQuoteDetails,
   useQuotesQuotesControllerGetStats,
   useQuotesQuotesControllerListQuotes,
@@ -14,6 +14,8 @@ import {
 } from '@nestlancer/api-client';
 import { queryKeys } from '@nestlancer/constants';
 import type { PaginatedResponse, Quote } from '@nestlancer/types';
+
+import { apiServices } from '@/lib/axios';
 
 export function useQuotesListQuery(params: {
   page: number;
@@ -56,9 +58,29 @@ export function useQuoteDetailQuery(id: string) {
   });
 }
 
+type QuoteActionVars = { id: string; data: Record<string, unknown> };
+
+/** NL-BV-C3-F5-01: live UI must use Idempotency-Key (handwritten QuotesService). */
+export function useAcceptQuoteMutation(options?: {
+  mutation?: UseMutationOptions<unknown, unknown, QuoteActionVars, unknown>;
+}) {
+  return useMutation({
+    mutationFn: ({ id, data }: QuoteActionVars) => apiServices.quotes.accept(id, data),
+    ...options?.mutation,
+  });
+}
+
+/** NL-BV-C3-F5-01: live UI must use Idempotency-Key (handwritten QuotesService). */
+export function useDeclineQuoteMutation(options?: {
+  mutation?: UseMutationOptions<unknown, unknown, QuoteActionVars, unknown>;
+}) {
+  return useMutation({
+    mutationFn: ({ id, data }: QuoteActionVars) => apiServices.quotes.decline(id, data),
+    ...options?.mutation,
+  });
+}
+
 export {
-  useQuotesQuotesControllerAcceptQuote as useAcceptQuoteMutation,
-  useQuotesQuotesControllerDeclineQuote as useDeclineQuoteMutation,
   useQuotesQuotesControllerRequestChanges as useRequestQuoteChangesMutation,
   quotesQuotesControllerDownloadPdf,
   peelSuccessEnvelope,

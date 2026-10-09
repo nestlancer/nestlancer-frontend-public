@@ -53,7 +53,7 @@ export function useNotificationsRealtime(opts: UseNotificationsRealtimeOptions):
       transports: ['websocket', 'polling'],
       auth: { token: accessToken },
       query: { auth: '1' },
-      withCredentials: true,
+      withCredentials: false,
       reconnection: true,
     });
 

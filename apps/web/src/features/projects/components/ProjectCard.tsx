@@ -5,10 +5,14 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">{project.title}</CardTitle>
+        <CardTitle className="text-base" title={project.title}>
+          {project.title}
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="line-clamp-2 text-sm text-muted-foreground">{project.description}</p>
+        <p className="line-clamp-2 text-sm text-muted-foreground" title={project.description}>
+          {project.description}
+        </p>
         <div className="mt-2">
           <DomainStatusBadge domain="project" status={project.status} />
         </div>

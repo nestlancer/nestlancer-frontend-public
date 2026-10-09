@@ -16,16 +16,16 @@ import {
   PageHeader,
   Pagination,
   SkeletonTable,
-  StatCard,
   StatusBadge,
   Button,
 } from '@nestlancer/ui';
 import { formatMoneyFromPaise } from '@nestlancer/utils';
 
 import { formatWorkStatusLabel, workStatusBadgeVariant } from '@/features/work/status-utils';
+import { WorkListShell } from '@/features/work/WorkListItem';
 import { ClientFilterBar } from '@/components/web/ClientFilterBar';
 import { ClientListPage } from '@/components/web/ClientListPage';
-import { webListCardClass, webPrimaryButtonClass } from '@/lib/tailadmin-classes';
+import { webMetricStripClass, webPrimaryButtonClass } from '@/lib/tailadmin-classes';
 
 const PAGE_SIZE = 12;
 
@@ -58,16 +58,14 @@ function QuotesStatBar({ stats }: { stats: Record<string, unknown> | undefined }
     { label: 'Declined', value: declined },
   ];
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-      {tiles.map((t, i) => (
-        <StatCard
-          key={t.label}
-          label={t.label}
-          value={t.value}
-          icon={<Receipt className="h-5 w-5" aria-hidden />}
-          iconVariant={i === 1 ? 'warning' : i === 2 ? 'success' : 'purple'}
-          stagger={(i + 1) as 1 | 2 | 3 | 4}
-        />
+    <div className={cn(webMetricStripClass, 'sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4')}>
+      {tiles.map((t) => (
+        <div key={t.label} className="px-3.5 py-2.5">
+          <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{t.label}</p>
+          <p className="mt-0.5 text-lg font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white/90">
+            {t.value}
+          </p>
+        </div>
       ))}
     </div>
   );
@@ -119,93 +117,102 @@ export function QuotesListClient() {
       />
       <QuotesStatBar stats={statsQ.data} />
 
-      <ClientFilterBar
-        filters={[
-          {
-            id: 'quote-status',
-            label: 'Filter quotes by status',
-            value: statusFilter,
-            options: QUOTE_STATUS_OPTIONS,
-            onChange: setStatusFilter,
-          },
-        ]}
-      />
+      <WorkListShell>
+        <div className="border-b border-border/60 p-3">
+          <ClientFilterBar
+            className="border-0 bg-transparent p-0 shadow-none dark:bg-transparent"
+            filters={[
+              {
+                id: 'quote-status',
+                label: 'Filter quotes by status',
+                value: statusFilter,
+                options: QUOTE_STATUS_OPTIONS,
+                onChange: setStatusFilter,
+              },
+            ]}
+          />
+        </div>
 
-      {isError ? (
-        <ErrorState
-          title="Could not load quotes"
-          message={getApiErrorMessage(error, 'Could not load quotes')}
-          onRetry={() => void refetch()}
-        />
-      ) : null}
-      {isPending ? <SkeletonTable rows={6} cols={3} /> : null}
-      {!isPending && !isError && items.length === 0 ? (
-        <EmptyState
-          title="No quotes yet"
-          description="When the Nestlancer team sends a quote for your request, it will show up here with amount, status, and a link to review."
-          action={
-            <Button className={webPrimaryButtonClass} asChild>
-              <Link href={routes.requests}>Browse requests</Link>
-            </Button>
-          }
-        />
-      ) : null}
-      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {items.map((q) => {
-          const amount = typeof q.totalAmount === 'number' ? q.totalAmount : q.amount;
-          const heading =
-            (typeof q.requestTitle === 'string' && q.requestTitle.trim()) ||
-            (typeof q.title === 'string' && q.title.trim()) ||
-            '';
-          const statusLabel = formatWorkStatusLabel(String(q.status));
-          const formatted =
-            typeof amount === 'number'
-              ? formatMoneyFromPaise(amount, q.currency ?? 'INR', 'en-IN')
-              : `— ${q.currency ?? ''}`;
-          const dateLabel = q.createdAt
-            ? new Date(q.createdAt).toLocaleString(undefined, { dateStyle: 'medium' })
-            : '—';
-          const ariaLabel = [heading || 'Quote', statusLabel, formatted, dateLabel]
-            .filter(Boolean)
-            .join(' · ');
+        {isError ? (
+          <div className="p-4">
+            <ErrorState
+              title="Could not load quotes"
+              message={getApiErrorMessage(error, 'Could not load quotes')}
+              onRetry={() => void refetch()}
+            />
+          </div>
+        ) : null}
+        {isPending ? (
+          <div className="p-4">
+            <SkeletonTable rows={6} cols={3} />
+          </div>
+        ) : null}
+        {!isPending && !isError && items.length === 0 ? (
+          <div className="p-4">
+            <EmptyState
+              title="No quotes yet"
+              description="When the Nestlancer team sends a quote for your request, it will show up here with amount, status, and a link to review."
+              action={
+                <Button className={webPrimaryButtonClass} asChild>
+                  <Link href={routes.requests}>Browse requests</Link>
+                </Button>
+              }
+            />
+          </div>
+        ) : null}
+        {!isPending && !isError
+          ? items.map((q) => {
+              const amount = typeof q.totalAmount === 'number' ? q.totalAmount : q.amount;
+              const heading =
+                (typeof q.requestTitle === 'string' && q.requestTitle.trim()) ||
+                (typeof q.title === 'string' && q.title.trim()) ||
+                '';
+              const statusLabel = formatWorkStatusLabel(String(q.status));
+              const formatted =
+                typeof amount === 'number'
+                  ? formatMoneyFromPaise(amount, q.currency ?? 'INR', 'en-IN')
+                  : `— ${q.currency ?? ''}`;
+              const dateLabel = q.createdAt
+                ? new Date(q.createdAt).toLocaleString(undefined, { dateStyle: 'medium' })
+                : '—';
+              const ariaLabel = [heading || 'Quote', statusLabel, formatted, dateLabel]
+                .filter(Boolean)
+                .join(' · ');
 
-          return (
-            <li key={q.id}>
-              <Link
-                href={routes.quote(q.id)}
-                aria-label={ariaLabel}
-                className={cn(
-                  webListCardClass,
-                  'hover:border-ta-brand-500/35 hover:shadow-theme-sm active:scale-[0.99]'
-                )}
-              >
-                <div className="relative flex items-start justify-between gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ta-brand-50 text-ta-brand-600 ring-1 ring-ta-brand-500/15 dark:bg-ta-brand-500/[0.12] dark:text-ta-brand-400">
-                    <Receipt className="h-5 w-5" aria-hidden />
+              return (
+                <Link
+                  key={q.id}
+                  href={routes.quote(q.id)}
+                  aria-label={ariaLabel}
+                  className={cn(
+                    'flex flex-wrap items-center gap-3 border-b border-border/60 px-4 py-3 transition-theme last:border-b-0',
+                    'hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40'
+                  )}
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                    <Receipt className="h-4 w-4" aria-hidden />
                   </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {heading || 'Untitled request'}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{dateLabel}</p>
+                  </div>
                   <StatusBadge
                     variant={workStatusBadgeVariant(String(q.status))}
                     dot
-                    className="capitalize"
+                    className="shrink-0 capitalize"
                   >
                     {statusLabel}
                   </StatusBadge>
-                </div>
-                <h2 className="mt-3 line-clamp-2 text-sm font-medium text-foreground">
-                  {heading || 'Untitled request'}
-                </h2>
-                <p className="mt-4 font-display text-2xl font-semibold tabular-nums tracking-tight text-foreground">
-                  {formatted}
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">{dateLabel}</p>
-                <span className="mt-4 inline-flex text-xs font-semibold text-ta-brand-500 opacity-0 transition-opacity group-hover:opacity-100">
-                  Review quote →
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                  <p className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
+                    {formatted}
+                  </p>
+                </Link>
+              );
+            })
+          : null}
+      </WorkListShell>
 
       {!isPending && !isError && total > 0 ? (
         <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />

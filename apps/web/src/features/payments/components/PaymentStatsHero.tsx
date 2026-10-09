@@ -1,14 +1,14 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Check, Clock, AlertTriangle } from '@nestlancer/ui/icons';
 
 import { getApiErrorMessage } from '@nestlancer/api-client';
 import { queryKeys } from '@nestlancer/constants';
-import { cn, StatCard } from '@nestlancer/ui';
+import { cn } from '@nestlancer/ui';
 import { formatMoneyFromPaise } from '@nestlancer/utils';
 
 import { apiServices } from '@/lib/axios';
+import { webMetricStripClass } from '@/lib/tailadmin-classes';
 
 export function PaymentStatsHero({ className }: { className?: string }) {
   const statsQ = useQuery({
@@ -20,8 +20,29 @@ export function PaymentStatsHero({ className }: { className?: string }) {
   // NL-BUG-UI-015: never coerce a failed fetch to ₹0.00 — that reads as "never paid".
   const showPlaceholders = statsQ.isPending || statsQ.isError;
   const placeholder = (
-    <span className="inline-block h-8 w-24 animate-pulse rounded bg-muted" aria-hidden />
+    <span className="inline-block h-6 w-20 animate-pulse rounded bg-muted" aria-hidden />
   );
+
+  const tiles = [
+    {
+      label: 'Total paid',
+      value: showPlaceholders
+        ? placeholder
+        : formatMoneyFromPaise(Number(stats?.totalSpent ?? 0), 'INR', 'en-IN'),
+    },
+    {
+      label: 'Pending',
+      value: showPlaceholders
+        ? placeholder
+        : formatMoneyFromPaise(Number(stats?.pending ?? 0), 'INR', 'en-IN'),
+    },
+    {
+      label: 'In dispute',
+      value: showPlaceholders
+        ? placeholder
+        : formatMoneyFromPaise(Number(stats?.inDispute ?? 0), 'INR', 'en-IN'),
+    },
+  ];
 
   return (
     <section className={cn('space-y-3', className)}>
@@ -37,40 +58,15 @@ export function PaymentStatsHero({ className }: { className?: string }) {
           </button>
         </div>
       ) : null}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard
-          label="Total paid"
-          value={
-            showPlaceholders
-              ? placeholder
-              : formatMoneyFromPaise(Number(stats?.totalSpent ?? 0), 'INR', 'en-IN')
-          }
-          icon={<Check className="h-5 w-5" aria-hidden />}
-          iconVariant="success"
-          stagger={1}
-        />
-        <StatCard
-          label="Pending"
-          value={
-            showPlaceholders
-              ? placeholder
-              : formatMoneyFromPaise(Number(stats?.pending ?? 0), 'INR', 'en-IN')
-          }
-          icon={<Clock className="h-5 w-5" aria-hidden />}
-          iconVariant="warning"
-          stagger={2}
-        />
-        <StatCard
-          label="In dispute"
-          value={
-            showPlaceholders
-              ? placeholder
-              : formatMoneyFromPaise(Number(stats?.inDispute ?? 0), 'INR', 'en-IN')
-          }
-          icon={<AlertTriangle className="h-5 w-5" aria-hidden />}
-          iconVariant="info"
-          stagger={3}
-        />
+      <div className={cn(webMetricStripClass, 'sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-3')}>
+        {tiles.map((t) => (
+          <div key={t.label} className="px-3.5 py-2.5">
+            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{t.label}</p>
+            <p className="mt-0.5 text-lg font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white/90">
+              {t.value}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );

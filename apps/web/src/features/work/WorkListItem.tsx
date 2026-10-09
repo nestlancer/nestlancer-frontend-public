@@ -49,18 +49,18 @@ export function WorkListItem({
     <Link
       href={href}
       className={cn(
-        'flex flex-wrap items-center gap-4 border-b border-border/60 bg-card px-5 py-4 transition-theme last:border-b-0',
+        'flex flex-wrap items-center gap-3 border-b border-border/60 bg-card px-4 py-3 transition-theme last:border-b-0',
         'hover:bg-accent/40 first:rounded-t-[var(--radius-lg,0.875rem)] last:rounded-b-[var(--radius-lg,0.875rem)]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40'
       )}
     >
       <span
         className={cn(
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md,0.625rem)] font-semibold',
+          'flex h-8 w-8 shrink-0 items-center justify-center rounded-md font-semibold',
           iconTone[iconVariant]
         )}
       >
-        <Icon className="h-5 w-5" aria-hidden />
+        <Icon className="h-4 w-4" aria-hidden />
       </span>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-foreground">{title}</p>

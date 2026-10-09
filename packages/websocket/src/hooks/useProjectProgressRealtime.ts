@@ -44,7 +44,7 @@ export function useProjectProgressRealtime(opts: UseProjectProgressRealtimeOptio
       transports: ['websocket'],
       auth: { token: accessToken },
       query: { auth: '1' },
-      withCredentials: true,
+      withCredentials: false,
       reconnection: false,
     });
 

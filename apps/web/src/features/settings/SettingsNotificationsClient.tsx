@@ -14,7 +14,7 @@ import { FieldHelp, FormFieldLabel } from '@nestlancer/field-help';
 import { SwitchRow } from '@/components/common/SwitchRow';
 import { WebPanel } from '@/components/web/WebPanel';
 import { apiServices } from '@/lib/axios';
-import { webPrimaryButtonClass } from '@/lib/tailadmin-classes';
+import { webPrimaryButtonClass, webStickyActionBarClass } from '@/lib/tailadmin-classes';
 import {
   NOTIFICATION_PREFERENCE_CATEGORIES,
   normalizePreferenceCategory,
@@ -264,7 +264,7 @@ export function SettingsNotificationsClient({ embedded = false }: { embedded?: b
               <li
                 key={channel.id}
                 className={cn(
-                  'rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-white/[0.04] dark:text-gray-300',
+                  'rounded-md border border-border/60 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground',
                   channel.status === 'requires_subscription' && 'opacity-80'
                 )}
                 title={
@@ -476,14 +476,23 @@ export function SettingsNotificationsClient({ embedded = false }: { embedded?: b
         </ul>
       </WebPanel>
 
-      <div className="flex justify-end border-t border-gray-100 pt-4 dark:border-gray-800">
-        <Button
-          type="submit"
-          className={cn('h-11 rounded-xl px-8 font-semibold', webPrimaryButtonClass)}
-          disabled={save.isPending}
-        >
-          {save.isPending ? 'Saving…' : 'Save changes'}
-        </Button>
+      <div className="h-16" aria-hidden />
+      <div
+        className={cn(
+          webStickyActionBarClass,
+          'lg:left-[var(--sidebar-width,16rem)]',
+          'pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+        )}
+      >
+        <div className="mx-auto flex max-w-dashboard justify-end">
+          <Button
+            type="submit"
+            className={cn('h-10 rounded-lg px-5 font-semibold', webPrimaryButtonClass)}
+            disabled={save.isPending}
+          >
+            {save.isPending ? 'Saving…' : 'Save changes'}
+          </Button>
+        </div>
       </div>
     </form>
   );

@@ -1,13 +1,14 @@
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import axios from 'axios';
 
-import { clearTokens, isActingAsUser, notifySessionExpired, setTokens } from '@nestlancer/auth';
 import {
-  applyCorrelationHeaders,
-  resolveCorrelationId,
-} from '@nestlancer/config/correlation-id.mjs';
+  clearTokens,
+  isActingAsUser,
+  notifySessionExpired,
+  trySilentRefreshOutcome,
+} from '@nestlancer/auth';
 
 import { isMaintenanceError, notifyMaintenanceFromError } from '../maintenance';
+import { isRetryableRequest } from './retry.interceptor';
 
 export interface ApiErrorPayload {
   message: string;
@@ -15,62 +16,11 @@ export interface ApiErrorPayload {
   code?: string;
 }
 
-interface RefreshResponseBody {
-  status?: string;
-  data?: {
-    accessToken?: string;
-    expiresIn?: number;
-    tokenType?: string;
-  };
-}
-
 /**
- * Logs 401s and triggers a single in-flight refresh via the same-origin auth BFF,
- * then retries the original request.
+ * Logs 401s and triggers a single in-flight refresh via the shared
+ * `@nestlancer/auth` silent-refresh flight, then retries the original request.
  */
-type RefreshOutcome =
-  | { kind: 'ok'; accessToken: string }
-  | { kind: 'none' } // definitive: 204 / 401 — session gone
-  | { kind: 'transient' }; // 5xx / network — keep session, do not force login
-
 export function attachErrorInterceptor(client: AxiosInstance): void {
-  let refreshPromise: Promise<RefreshOutcome> | null = null;
-
-  async function performRefresh(): Promise<RefreshOutcome> {
-    if (typeof window === 'undefined') return { kind: 'none' };
-    try {
-      const refreshUrl = `${window.location.origin}/api/auth/refresh`;
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      applyCorrelationHeaders(headers, resolveCorrelationId({ headers }));
-      const response = await axios.post<RefreshResponseBody>(
-        refreshUrl,
-        {},
-        {
-          withCredentials: true,
-          headers,
-          timeout: 15_000,
-          // 204 = cleared session; 503 = upstream blip (cookies kept).
-          validateStatus: (status) =>
-            (status >= 200 && status < 300) || status === 204 || status === 503 || status === 502,
-        }
-      );
-      if (response.status === 204 || response.status === 401) return { kind: 'none' };
-      if (response.status === 503 || response.status === 502) return { kind: 'transient' };
-      const body = response.data;
-      const tokens = body?.data ?? null;
-      if (!tokens?.accessToken) return { kind: 'none' };
-      setTokens({
-        accessToken: tokens.accessToken,
-        expiresIn: tokens.expiresIn,
-        tokenType: tokens.tokenType,
-      });
-      return { kind: 'ok', accessToken: tokens.accessToken };
-    } catch {
-      // Network / timeout against BFF — do not treat as logout.
-      return { kind: 'transient' };
-    }
-  }
-
   client.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError<ApiErrorPayload>) => {
@@ -106,17 +56,18 @@ export function attachErrorInterceptor(client: AxiosInstance): void {
 
       original.__retriedAuth = true;
 
-      if (!refreshPromise) {
-        refreshPromise = performRefresh().finally(() => {
-          refreshPromise = null;
-        });
-      }
-
-      const outcome = await refreshPromise;
+      // Share the SessionBootstrap flight — never open a second /api/auth/refresh
+      // against the same rotated jti (NL-BUG-SESSION-01 / concurrent reuse wipe).
+      const outcome = await trySilentRefreshOutcome();
       if (outcome.kind !== 'ok') {
         if (outcome.kind === 'none') {
           notifySessionExpired('refresh_failed');
         }
+        return Promise.reject(error);
+      }
+
+      // Never replay non-idempotent writes — duplicate payments/refunds (NL-BV-C1-01).
+      if (!isRetryableRequest(original)) {
         return Promise.reject(error);
       }
 

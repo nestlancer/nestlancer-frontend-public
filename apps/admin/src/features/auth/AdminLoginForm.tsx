@@ -42,6 +42,7 @@ export function AdminLoginForm() {
 
   return (
     <form
+      method="post"
       onSubmit={form.handleSubmit((values) => {
         const email = values.email.trim();
         let token: string;

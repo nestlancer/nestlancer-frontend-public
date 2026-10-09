@@ -54,6 +54,7 @@ export function DashboardHeader({ onOpenMobileNav }: { onOpenMobileNav: () => vo
           <Link
             href={routes.dashboard}
             className="font-semibold tracking-tight text-gray-800 dark:text-white/90 lg:hidden"
+            aria-label="Nestlancer dashboard"
           >
             <NestlancerLogo variant="full" size="sm" />
           </Link>

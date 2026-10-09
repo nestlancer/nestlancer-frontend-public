@@ -14,8 +14,8 @@ describe('safe urls', () => {
     );
     expect(safeHttpUrl('javascript:alert(1)')).toBeNull();
     expect(safeHttpUrl('//evil.example/phish')).toBeNull();
-    expect(safeNavigationUrl('mailto:hello@nestlancer.com', { mailto: true })).toBe(
-      'mailto:hello@nestlancer.com'
+    expect(safeNavigationUrl('mailto:contact@nestlancer.com', { mailto: true })).toBe(
+      'mailto:contact@nestlancer.com'
     );
   });
 

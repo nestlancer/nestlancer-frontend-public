@@ -15,7 +15,6 @@ import {
   SliceFaultBanner,
 } from '@/components/admin/AdminCharts';
 import {
-  GeCard,
   GeCardHeader,
   GeChartTabs,
   GePageHeader,
@@ -97,38 +96,42 @@ function mapRecentRequests(data: unknown) {
 function AttentionChip({
   href,
   label,
+  shortLabel,
   value,
   tone = 'default',
 }: {
   href: string;
   label: string;
+  /** Compact label for narrow viewports (full `label` stays on title). */
+  shortLabel?: string;
   value: string;
   tone?: 'default' | 'warning' | 'critical' | 'success';
 }) {
-  const toneClass =
+  const accent =
     tone === 'warning'
-      ? 'border-amber-500/35 bg-amber-500/10 text-amber-200'
+      ? 'border-l-amber-500 text-foreground'
       : tone === 'critical'
-        ? 'border-rose-500/35 bg-rose-500/10 text-rose-200'
+        ? 'border-l-rose-500 text-foreground'
         : tone === 'success'
-          ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-200'
-          : 'border-border/70 bg-card/80 text-foreground';
+          ? 'border-l-emerald-500/70 text-foreground'
+          : 'border-l-transparent text-foreground';
 
   return (
     <Link
       href={href}
+      title={label}
       className={cn(
-        'group flex min-w-[8.5rem] flex-1 items-center justify-between gap-2 rounded-xl border px-3 py-2.5 transition-all',
-        'hover:-translate-y-0.5 hover:border-primary/40',
-        toneClass
+        'group flex min-w-0 flex-1 items-baseline justify-between gap-2',
+        'rounded-sm border border-border/50 border-l-2 bg-card/60 px-2 py-1.5 transition-colors',
+        'hover:border-primary/40 hover:bg-card',
+        accent
       )}
     >
-      <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          {label}
-        </p>
-        <p className="mt-0.5 text-base font-semibold tabular-nums tracking-tight">{value}</p>
-      </div>
+      <span className="min-w-0 text-[11px] font-medium leading-tight text-muted-foreground">
+        <span className="sm:hidden">{shortLabel ?? label}</span>
+        <span className="hidden sm:inline">{label}</span>
+      </span>
+      <span className="shrink-0 text-sm font-semibold tabular-nums tracking-tight">{value}</span>
     </Link>
   );
 }
@@ -293,20 +296,20 @@ export function DashboardClient() {
         title="Command center"
         description="Live revenue, queues, and what needs action — refreshed every 30s."
         actions={
-          <>
-            <Button variant="outline" size="sm" asChild>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end">
+            <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
               <Link href="/pipeline">Pipelines</Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
               <Link href="/analytics">Analytics</Link>
             </Button>
-            <Button size="sm" asChild>
+            <Button size="sm" asChild className="w-full sm:w-auto">
               <Link href="/requests?status=inbox">
                 <Inbox className="mr-1.5 h-3.5 w-3.5" aria-hidden />
                 Inbox
               </Link>
             </Button>
-          </>
+          </div>
         }
       />
 
@@ -318,15 +321,13 @@ export function DashboardClient() {
             aria-label="Needs attention"
             className="animate-fade-in-up motion-reduce:animate-none opacity-0 [animation-delay:40ms]"
           >
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-primary" aria-hidden />
+                <Activity className="h-3.5 w-3.5 text-primary" aria-hidden />
                 <h2 className="text-sm font-semibold tracking-tight text-foreground">
                   Needs attention
                 </h2>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Live
-                </span>
+                <span className="text-[11px] font-medium text-muted-foreground">Live</span>
               </div>
               {overview.health ? (
                 <Badge color={healthTone} size="sm">
@@ -334,135 +335,107 @@ export function DashboardClient() {
                 </Badge>
               ) : null}
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-1.5 rounded-md border border-border/50 bg-muted/20 p-1.5 sm:flex sm:flex-wrap">
               <AttentionChip
                 href="/requests?status=inbox"
                 label="Pending requests"
+                shortLabel="Requests"
                 value={String(pendingRequests)}
                 tone={pendingRequests > 0 ? 'warning' : 'success'}
               />
               <AttentionChip
                 href="/quotes"
                 label="Open quotes"
+                shortLabel="Quotes"
                 value={String(openQuotes)}
                 tone={openQuotes > 0 ? 'default' : 'success'}
               />
               <AttentionChip
                 href="/payments?status=pending"
                 label="Pending pay"
+                shortLabel="Payments"
                 value={String(paymentPulse.pendingTransactions)}
                 tone={paymentPulse.pendingTransactions > 0 ? 'warning' : 'success'}
               />
               <AttentionChip
                 href="/moderation"
                 label="Flagged msgs"
+                shortLabel="Flagged"
                 value={String(flaggedCount)}
                 tone={flaggedCount > 0 ? 'critical' : 'success'}
               />
               <AttentionChip
                 href="/contact"
                 label="Contact new"
+                shortLabel="Contact"
                 value={String(contactNew)}
                 tone={contactNew > 0 ? 'warning' : 'success'}
               />
               <AttentionChip
                 href="/system"
                 label="Alerts"
+                shortLabel="Alerts"
                 value={String(liveAlerts.length)}
                 tone={liveAlerts.length > 0 ? 'critical' : 'success'}
               />
             </div>
           </section>
 
-          <section className="animate-fade-in-up motion-reduce:animate-none opacity-0 [animation-delay:70ms]">
-            <div className="ge-kpi-tile ge-kpi-tile--hero">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <Link href="/analytics" className="min-w-0 flex-1 no-underline text-inherit">
-                  <p className="ge-kpi-tile-label">{revenueKpi?.label || 'Revenue (period)'}</p>
-                  <p className="ge-kpi-tile-value mt-1">{revenueKpi?.value || '—'}</p>
-                  <p className="ge-kpi-tile-hint mt-1">
-                    {overview.periodLabel || revenueKpi?.hint || 'Completed payments'}
-                    {paymentPulse.pendingAmount > 0
-                      ? ` · ${formatINR(paymentPulse.pendingAmount)} awaiting settlement`
-                      : ''}
-                  </p>
-                </Link>
-                <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 animate-fade-in-up motion-reduce:animate-none opacity-0 [animation-delay:70ms]">
+            <p className="text-[11px] font-medium text-muted-foreground">
+              Period metrics · {overview.periodLabel || 'selected window'}
+            </p>
+            <GeChartTabs
+              value={chartPeriod}
+              onChange={setChartPeriod}
+              options={[...PERIOD_OPTIONS]}
+            />
+          </div>
+
+          <AdminMetricStrip
+            items={[
+              {
+                label: revenueKpi?.label || 'Revenue (period)',
+                value: revenueKpi?.value || '—',
+                hint:
+                  (revenueKpi?.hint || 'Completed payments') +
+                  (paymentPulse.pendingAmount > 0
+                    ? ` · ${formatINR(paymentPulse.pendingAmount)} awaiting`
+                    : ''),
+                href: '/analytics',
+                delta: getKpiDeltaFromKey('revenue'),
+              },
+              ...supportingKpis.slice(0, 5),
+            ]}
+            max={6}
+            dense
+          />
+
+          <div className="ge-row ge-col-8-4 animate-fade-in-up motion-reduce:animate-none opacity-0 [animation-delay:120ms] [content-visibility:auto]">
+            <div className="h-full overflow-hidden rounded-md border border-border/50 bg-card/80">
+              <GeCardHeader
+                title="Revenue trajectory"
+                subtitle={overview.periodLabel || 'Completed payments'}
+                actions={
                   <GeChartTabs
                     value={chartPeriod}
                     onChange={setChartPeriod}
                     options={[...PERIOD_OPTIONS]}
                   />
-                  {getKpiDeltaFromKey('revenue') ? (
-                    <Badge
-                      color={
-                        getKpiDeltaFromKey('revenue')!.deltaType === 'increase'
-                          ? 'emerald'
-                          : getKpiDeltaFromKey('revenue')!.deltaType === 'decrease'
-                            ? 'rose'
-                            : 'slate'
-                      }
-                      size="sm"
-                    >
-                      {getKpiDeltaFromKey('revenue')!.text} vs prior
-                    </Badge>
-                  ) : null}
-                </div>
+                }
+              />
+              <div className="px-3 pb-2 pt-0">
+                <RevenueAreaChart
+                  data={revenueArea}
+                  compact
+                  loading={overviewResult.isPending && !overviewResult.data}
+                  error={overviewResult.error}
+                  hideHeader
+                  title="Revenue over time"
+                  description="Completed payments for the selected window"
+                />
               </div>
             </div>
-          </section>
-
-          <AdminMetricStrip items={supportingKpis} max={6} className="gap-3" />
-
-          {overview.quickStats.length ? (
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4 animate-fade-in-up motion-reduce:animate-none opacity-0 [animation-delay:90ms]">
-              {overview.quickStats.slice(0, 4).map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-xl border border-border/70 bg-card/70 px-3.5 py-2.5"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold tabular-nums text-foreground">
-                    {stat.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          <div className="ge-row ge-col-8-4 animate-fade-in-up motion-reduce:animate-none opacity-0 [animation-delay:120ms] [content-visibility:auto]">
-            <GeCard flush className="h-full overflow-hidden">
-              <div className="relative">
-                <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.12),transparent_70%)]"
-                  aria-hidden
-                />
-                <GeCardHeader
-                  title="Revenue trajectory"
-                  subtitle={overview.periodLabel || 'Completed payments'}
-                  actions={
-                    <GeChartTabs
-                      value={chartPeriod}
-                      onChange={setChartPeriod}
-                      options={[...PERIOD_OPTIONS]}
-                    />
-                  }
-                />
-                <div className="relative px-3 pb-2 pt-0">
-                  <RevenueAreaChart
-                    data={revenueArea}
-                    compact
-                    loading={overviewResult.isPending && !overviewResult.data}
-                    error={overviewResult.error}
-                    hideHeader
-                    title="Revenue over time"
-                    description="Completed payments for the selected window"
-                  />
-                </div>
-              </div>
-            </GeCard>
 
             <GeStorageWidget
               title="Project mix"
@@ -507,36 +480,30 @@ export function DashboardClient() {
           </div>
 
           <div className="ge-row ge-col-8-4 animate-fade-in-up motion-reduce:animate-none opacity-0 [animation-delay:200ms] [content-visibility:auto]">
-            <GeCard flush className="h-full overflow-hidden">
-              <div className="relative">
-                <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(ellipse_at_top,hsl(186_94%_43%/0.16),transparent_72%)]"
-                  aria-hidden
+            <div className="h-full overflow-hidden rounded-md border border-border/50 bg-card/80">
+              <GeCardHeader
+                title="Request volume over time"
+                subtitle="Inbound briefs · last 30 days · live"
+                actions={
+                  <Badge color="cyan" size="sm">
+                    {formatNumber(requestVolumeTotal)} total
+                  </Badge>
+                }
+              />
+              <div className="px-3 pb-2 pt-0">
+                <RequestVolumeAreaChart
+                  data={requestVolume}
+                  compact
+                  hideHeader
+                  loading={requestStatsQ.isPending && !requestStatsQ.data}
+                  error={requestStatsQ.error}
                 />
-                <GeCardHeader
-                  title="Request volume over time"
-                  subtitle="Inbound briefs · last 30 days · live"
-                  actions={
-                    <Badge color="cyan" size="sm">
-                      {formatNumber(requestVolumeTotal)} total
-                    </Badge>
-                  }
-                />
-                <div className="relative px-3 pb-2 pt-0">
-                  <RequestVolumeAreaChart
-                    data={requestVolume}
-                    compact
-                    hideHeader
-                    loading={requestStatsQ.isPending && !requestStatsQ.data}
-                    error={requestStatsQ.error}
-                  />
-                </div>
               </div>
-            </GeCard>
+            </div>
 
-            <GeCard flush className="h-full">
+            <div className="h-full overflow-hidden rounded-md border border-border/50 bg-card/80">
               <GeCardHeader title="Moderation queues" subtitle="Flagged + contact inbox" />
-              <div className="ge-card-body space-y-1 !py-1">
+              <div className="divide-y divide-border/40">
                 {[
                   {
                     href: '/moderation',
@@ -570,14 +537,9 @@ export function DashboardClient() {
                   <Link
                     key={href}
                     href={href}
-                    className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
+                    className="flex items-center gap-2 px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/40"
                   >
-                    <span
-                      className={cn(
-                        'flex h-7 w-7 items-center justify-center rounded-md bg-primary/10',
-                        tone
-                      )}
-                    >
+                    <span className={cn('flex h-5 w-5 items-center justify-center', tone)}>
                       <Icon className="h-3.5 w-3.5" aria-hidden />
                     </span>
                     <span className="flex-1">{label}</span>
@@ -585,7 +547,7 @@ export function DashboardClient() {
                   </Link>
                 ))}
               </div>
-            </GeCard>
+            </div>
           </div>
 
           {process.env.NODE_ENV === 'development' && <DebugApiSection payloads={debugPayloads} />}

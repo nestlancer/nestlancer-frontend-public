@@ -4,10 +4,6 @@ import { withRequestLog } from '@nestlancer/config/request-log.mjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const auth = createAuthMiddleware({
-  publicPrefixes: ['/share', '/contact', '/work', '/terms', '/privacy'],
-});
-
 const protectedMatchers = [
   '/dashboard',
   '/projects',
@@ -19,8 +15,14 @@ const protectedMatchers = [
   '/invoices',
   '/profile',
   '/settings',
+  // Auth island under public `/blog` tree — must win over defaultPublic `/blog` (NL-BUG-P43-001).
   '/blog/bookmarks',
 ];
+
+const auth = createAuthMiddleware({
+  publicPrefixes: ['/share', '/contact', '/work', '/terms', '/privacy'],
+  protectedPrefixes: protectedMatchers,
+});
 
 function isProtected(pathname: string): boolean {
   return protectedMatchers.some(
@@ -29,6 +31,18 @@ function isProtected(pathname: string): boolean {
 }
 
 export function middleware(request: NextRequest) {
+  // Portal entry redirect must carry CSP like landing/admin middleware redirects.
+  // next.config redirects() emit a bare 307 without production CSP (audit S08/A17).
+  if (request.nextUrl.pathname === '/') {
+    const dest = request.nextUrl.clone();
+    dest.pathname = '/login';
+    return withRequestLog(
+      withCspNonce(NextResponse.redirect(dest, 307), request),
+      request,
+      'nl-prod-frontend-web'
+    );
+  }
+
   const response = isProtected(request.nextUrl.pathname) ? auth(request) : NextResponse.next();
   return withRequestLog(withCspNonce(response, request), request, 'nl-prod-frontend-web');
 }

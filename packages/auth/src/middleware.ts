@@ -6,6 +6,11 @@ import { ACCESS_TOKEN_COOKIE, IMPERSONATION_COOKIE, REFRESH_TOKEN_COOKIE } from 
 export interface AuthMiddlewareConfig {
   loginPath?: string;
   publicPrefixes?: string[];
+  /**
+   * Auth-required islands nested under a public prefix (e.g. `/blog/bookmarks` under `/blog`).
+   * Checked before publicPrefixes so public trees cannot bypass the gate (NL-BUG-P43-001).
+   */
+  protectedPrefixes?: string[];
 }
 
 const defaultPublic = [
@@ -21,6 +26,10 @@ const defaultPublic = [
   '/api',
 ];
 
+function matchesPrefix(pathname: string, prefixes: string[]): boolean {
+  return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
 /**
  * Edge-compatible guard: presence of HttpOnly refresh cookie (or legacy access cookie).
  * Access JWT for API calls lives in memory only; refresh cookie restores session on load.
@@ -29,11 +38,13 @@ const defaultPublic = [
 export function createAuthMiddleware(config: AuthMiddlewareConfig = {}) {
   const loginPath = config.loginPath ?? '/login';
   const publicPrefixes = [...defaultPublic, ...(config.publicPrefixes ?? [])];
+  const protectedPrefixes = config.protectedPrefixes ?? [];
 
   return function authMiddleware(request: NextRequest): NextResponse {
     const { pathname } = request.nextUrl;
 
-    if (publicPrefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+    const forceProtected = matchesPrefix(pathname, protectedPrefixes);
+    if (!forceProtected && matchesPrefix(pathname, publicPrefixes)) {
       return NextResponse.next();
     }
 

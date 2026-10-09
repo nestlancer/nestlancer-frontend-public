@@ -112,18 +112,18 @@ export function CapacityDashboard() {
       {q.isLoading ? (
         <p className="text-sm text-muted-foreground">Loading capacity…</p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 overflow-hidden rounded-md border border-border/60 bg-card/80 divide-x divide-y divide-border/50 lg:grid-cols-4 lg:divide-y-0">
           {metrics.map((m) => (
             <div
               key={m.label}
               className={
                 m.label === 'Capacity used' && isOverCapacity
-                  ? 'rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2'
-                  : 'rounded-md border border-border/60 bg-muted/20 px-3 py-2'
+                  ? 'bg-amber-500/10 px-3 py-2'
+                  : 'px-3 py-2'
               }
             >
-              <p className="text-xs text-muted-foreground">{m.label}</p>
-              <p className="mt-1 text-lg font-semibold tabular-nums">{String(m.value)}</p>
+              <p className="text-[11px] font-medium text-muted-foreground">{m.label}</p>
+              <p className="mt-0.5 text-base font-semibold tabular-nums">{String(m.value)}</p>
             </div>
           ))}
         </div>
@@ -159,13 +159,25 @@ export function CapacityDashboard() {
           />
         </div>
       </div>
-      <Button
-        size="sm"
-        disabled={saveM.isPending || (!maxActive.trim() && !warningAt.trim())}
-        onClick={() => saveM.mutate()}
-      >
-        {saveM.isPending ? 'Saving…' : 'Update capacity settings'}
-      </Button>
+      <div className="space-y-1.5">
+        <Button
+          size="sm"
+          disabled={saveM.isPending || (!maxActive.trim() && !warningAt.trim())}
+          title={
+            !maxActive.trim() && !warningAt.trim()
+              ? 'Enter a max active count or warning threshold to save'
+              : undefined
+          }
+          onClick={() => saveM.mutate()}
+        >
+          {saveM.isPending ? 'Saving…' : 'Update capacity settings'}
+        </Button>
+        {!maxActive.trim() && !warningAt.trim() ? (
+          <p className="text-xs text-muted-foreground">
+            Enter a max active count or warning threshold to enable save.
+          </p>
+        ) : null}
+      </div>
     </section>
   );
 }

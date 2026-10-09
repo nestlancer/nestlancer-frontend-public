@@ -87,22 +87,26 @@ export function AdminMessagesPanelClient() {
       <MessagingSplitWorkspace
         queue={<AdminInboxQueuePane />}
         context={
-          <div className="messaging-panel-elevated flex h-full min-h-0 flex-col gap-3 overflow-y-auto p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Inbox snapshot
-            </p>
-            <div className="ge-card space-y-1 rounded-lg border border-border bg-card p-3">
-              <InboxStatRow label="Open" value={items.length} />
-              <InboxStatRow label="Unread" value={totalUnread} accent={totalUnread > 0} />
-              <InboxStatRow label="Waiting" value={unreadCount} warn={unreadCount > 0} />
+          <div className="messaging-panel-elevated flex h-full min-h-0 flex-col gap-4 overflow-y-auto bg-muted/10 p-3">
+            <div>
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                Inbox snapshot
+              </p>
+              <div className="divide-y divide-border/40 border-y border-border/40 py-1">
+                <InboxStatRow label="Open" value={items.length} />
+                <InboxStatRow label="Unread" value={totalUnread} accent={totalUnread > 0} />
+                <InboxStatRow label="Waiting" value={unreadCount} warn={unreadCount > 0} />
+              </div>
             </div>
-            <div className="ge-card space-y-1 rounded-lg border border-border bg-card p-3">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <div>
+              <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 By type
               </p>
-              <InboxStatRow label="Project" value={projectCount} muted />
-              <InboxStatRow label="Direct" value={directCount} muted />
-              <InboxStatRow label="Group" value={groupCount} muted />
+              <div className="divide-y divide-border/40 border-y border-border/40 py-1">
+                <InboxStatRow label="Project" value={projectCount} muted />
+                <InboxStatRow label="Direct" value={directCount} muted />
+                <InboxStatRow label="Group" value={groupCount} muted />
+              </div>
             </div>
           </div>
         }

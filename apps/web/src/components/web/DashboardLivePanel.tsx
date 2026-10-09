@@ -45,11 +45,11 @@ export function DashboardLivePanel({
   const shown = rows.slice(0, maxRows);
 
   return (
-    <WebPanel padding="sm" className={cn('flex h-full flex-col', className)}>
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
+    <WebPanel padding="none" className={cn('flex h-full flex-col overflow-hidden', className)}>
+      <div className="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-2 dark:border-gray-800">
+        <div className="flex min-w-0 items-center gap-1.5">
           {icon ? (
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-ta-brand-50 text-ta-brand-600 dark:bg-ta-brand-500/15 dark:text-ta-brand-400">
+            <span className="shrink-0 text-gray-400 dark:text-gray-500 [&_svg]:h-3.5 [&_svg]:w-3.5">
               {icon}
             </span>
           ) : null}
@@ -68,10 +68,10 @@ export function DashboardLivePanel({
       </div>
 
       {loading ? (
-        <ul className="space-y-2">
+        <ul className="divide-y divide-gray-100 dark:divide-gray-800">
           {Array.from({ length: maxRows }).map((_, i) => (
-            <li key={`live-skel-${i}`}>
-              <Skeleton className="h-11 w-full rounded-lg" />
+            <li key={`live-skel-${i}`} className="px-3 py-2">
+              <Skeleton className="h-7 w-full rounded-md" />
             </li>
           ))}
         </ul>
@@ -83,18 +83,16 @@ export function DashboardLivePanel({
           className="py-4"
         />
       ) : (
-        <ul className="min-h-0 flex-1 space-y-1">
+        <ul className="min-h-0 flex-1 divide-y divide-gray-100 dark:divide-gray-800">
           {shown.map((row) => (
             <li key={row.id}>
               <Link
                 href={row.href}
                 className={cn(
-                  'group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 transition-colors',
-                  'hover:border-ta-brand-500/25 hover:bg-ta-brand-50/50 dark:hover:bg-ta-brand-500/10',
-                  row.tone === 'amber' &&
-                    'border-amber-200/60 bg-amber-50/40 dark:border-amber-500/20 dark:bg-amber-500/10',
-                  row.tone === 'emerald' &&
-                    'border-emerald-200/60 bg-emerald-50/40 dark:border-emerald-500/20 dark:bg-emerald-500/10'
+                  'group flex items-center gap-2 px-3 py-1.5 transition-colors',
+                  'hover:bg-ta-brand-50/40 dark:hover:bg-ta-brand-500/[0.06]',
+                  row.tone === 'amber' && 'bg-amber-50/30 dark:bg-amber-500/[0.06]',
+                  row.tone === 'emerald' && 'bg-emerald-50/30 dark:bg-emerald-500/[0.06]'
                 )}
               >
                 <span className="min-w-0 flex-1">

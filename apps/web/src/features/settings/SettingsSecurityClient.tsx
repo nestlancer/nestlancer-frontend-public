@@ -116,7 +116,7 @@ export function SettingsSecurityClient() {
                 type="password"
                 autoComplete="current-password"
                 placeholder="Enter your current password"
-                className="h-11 rounded-xl border-border/80 bg-background/80"
+                className="h-9 rounded-md border-border/80 bg-background/80"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
@@ -137,7 +137,7 @@ export function SettingsSecurityClient() {
                   type="password"
                   autoComplete="new-password"
                   placeholder="Create a new password"
-                  className="h-11 rounded-xl border-border/80 bg-background/80"
+                  className="h-9 rounded-md border-border/80 bg-background/80"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -157,7 +157,7 @@ export function SettingsSecurityClient() {
                   type="password"
                   autoComplete="new-password"
                   placeholder="Re-enter your password"
-                  className="h-11 rounded-xl border-border/80 bg-background/80"
+                  className="h-9 rounded-md border-border/80 bg-background/80"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -169,7 +169,7 @@ export function SettingsSecurityClient() {
           <div className="flex justify-end border-t border-gray-100 pt-4 dark:border-gray-800">
             <Button
               type="submit"
-              className={cn('h-11 rounded-xl px-6 font-semibold', webPrimaryButtonClass)}
+              className={cn('h-9 rounded-md px-5 font-semibold', webPrimaryButtonClass)}
               disabled={changePw.isPending}
             >
               {changePw.isPending ? 'Updating…' : 'Update password'}
@@ -203,7 +203,7 @@ export function SettingsSecurityClient() {
             <Button
               type="button"
               variant="outline"
-              className="rounded-xl font-semibold text-destructive hover:bg-destructive/10"
+              className="rounded-xl font-semibold text-red-800 hover:bg-destructive/10 dark:text-red-300"
               disabled={logoutAll.isPending}
               onClick={async () => {
                 if (
@@ -280,7 +280,7 @@ export function SettingsSecurityClient() {
                       variant="ghost"
                       size="sm"
                       disabled={revokeOne.isPending}
-                      className="font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      className="font-semibold text-red-800 hover:bg-destructive/10 hover:text-red-900 dark:text-red-300 dark:hover:text-red-200"
                       onClick={async () => {
                         if (
                           await confirm({
@@ -354,6 +354,9 @@ function TwoFactorSettingsSection() {
       const codes = Array.isArray(r.backupCodes) ? r.backupCodes.map(String) : [];
       setBackupCodes(codes);
       clearSetup();
+      setPassword(''); // NL-BV-W9-02
+      // Optimistic status so the badge does not stay "Not enabled" while refetch/replica catches up.
+      qc.setQueryData(queryKeys.users.twoFactorStatus, { enabled: true, method: 'totp' });
       toast.success('Two-factor authentication enabled');
       void qc.invalidateQueries({ queryKey: queryKeys.users.twoFactorStatus });
     },
@@ -389,6 +392,7 @@ function TwoFactorSettingsSection() {
           : [];
       const codes = raw.map(String).filter(Boolean);
       setBackupCodes(codes.length > 0 ? codes : null);
+      setPassword(''); // NL-BV-W9-02
       if (codes.length > 0) {
         toast.success('New backup codes generated — save them now');
       } else {
@@ -445,7 +449,7 @@ function TwoFactorSettingsSection() {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 rounded-xl"
+            className="h-9 rounded-md"
           />
         </div>
 
@@ -520,8 +524,17 @@ function TwoFactorSettingsSection() {
                     maxLength={6}
                     value={setupCode}
                     onChange={(e) => setSetupCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className="h-11 rounded-xl"
+                    onInput={(e) =>
+                      setSetupCode((e.currentTarget.value || '').replace(/\D/g, '').slice(0, 6))
+                    }
+                    aria-invalid={verifyM.isError || undefined}
+                    className="h-9 rounded-md"
                   />
+                  {verifyM.isError ? (
+                    <p className="text-sm text-destructive" role="alert">
+                      {getApiErrorMessage(verifyM.error, 'Invalid verification code')}
+                    </p>
+                  ) : null}
                   <Button
                     type="button"
                     className={cn('mt-2 rounded-xl font-semibold', webPrimaryButtonClass)}
@@ -556,7 +569,7 @@ function TwoFactorSettingsSection() {
                 maxLength={6}
                 value={disableCode}
                 onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                className="h-11 rounded-xl"
+                className="h-9 rounded-md"
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -572,7 +585,7 @@ function TwoFactorSettingsSection() {
               <Button
                 type="button"
                 variant="outline"
-                className="rounded-xl text-destructive hover:bg-destructive/10"
+                className="rounded-xl text-red-800 hover:bg-destructive/10 dark:text-red-300"
                 disabled={!password || disableCode.trim().length < 6 || disableM.isPending}
                 onClick={() => disableM.mutate()}
               >

@@ -3,6 +3,7 @@ import type { AxiosInstance } from 'axios';
 
 import { BaseService } from './base.service';
 import { extractDocumentUrl } from '../utils/extract-document-url';
+import { withIdempotencyHeaders } from '../utils/idempotency-key';
 import { parsePaymentIntentResult } from '../utils/parse-payment-intent';
 import { asPaginated, peelSuccessEnvelope } from '../utils/peel-success-envelope';
 import { unwrapGatewayBody } from '../utils/unwrap-gateway-body';
@@ -84,7 +85,11 @@ export class PaymentsService extends BaseService {
   }
 
   async createIntent(payload: Record<string, unknown>) {
-    const { data } = await this.client.post<unknown>('/payments/create-intent', payload);
+    const { data } = await this.client.post<unknown>(
+      '/payments/create-intent',
+      payload,
+      withIdempotencyHeaders('pay-intent')
+    );
     return parsePaymentIntentResult(data);
   }
 
@@ -124,17 +129,29 @@ export class PaymentsService extends BaseService {
     mediaIds: string[];
     notes?: string;
   }): Promise<unknown> {
-    const { data } = await this.client.post<unknown>('/payments/bank-transfer/submit', payload);
+    const { data } = await this.client.post<unknown>(
+      '/payments/bank-transfer/submit',
+      payload,
+      withIdempotencyHeaders('pay-bank')
+    );
     return peelSuccessEnvelope(data);
   }
 
   async initiate(payload: Record<string, unknown>): Promise<unknown> {
-    const { data } = await this.client.post<unknown>('/payments/initiate', payload);
+    const { data } = await this.client.post<unknown>(
+      '/payments/initiate',
+      payload,
+      withIdempotencyHeaders('pay-init')
+    );
     return peelSuccessEnvelope(data);
   }
 
   async confirm(payload: Record<string, unknown>): Promise<unknown> {
-    const { data } = await this.client.post<unknown>('/payments/confirm', payload);
+    const { data } = await this.client.post<unknown>(
+      '/payments/confirm',
+      payload,
+      withIdempotencyHeaders('pay-confirm')
+    );
     return peelSuccessEnvelope(data);
   }
 

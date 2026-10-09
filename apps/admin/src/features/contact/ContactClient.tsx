@@ -324,7 +324,7 @@ export function ContactClient() {
                             type="button"
                             onClick={() => setStatusFilter(f.id)}
                             className={cn(
-                              'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors',
+                              'inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium transition-colors',
                               active
                                 ? 'border-primary/40 bg-primary/10 text-primary'
                                 : 'border-border bg-background text-muted-foreground hover:bg-muted/60 hover:text-foreground'
@@ -333,7 +333,7 @@ export function ContactClient() {
                             {f.label}
                             <span
                               className={cn(
-                                'rounded-full px-1.5 py-0.5 text-[10px] tabular-nums',
+                                'rounded px-1 py-0.5 text-[10px] tabular-nums',
                                 active ? 'bg-primary/15' : 'bg-muted'
                               )}
                             >
@@ -445,23 +445,39 @@ export function ContactClient() {
                               ))}
                             </Select>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="mt-2 w-full"
-                            disabled={
-                              !statusDraft ||
-                              statusDraft === contactStatus(selected) ||
-                              updateStatusM.isPending
-                            }
-                            onClick={() => {
-                              const id = rowId(selected);
-                              if (!id || !statusDraft) return;
-                              updateStatusM.mutate({ id, status: statusDraft });
-                            }}
-                          >
-                            Update status
-                          </Button>
+                          <div className="mt-2 space-y-1.5">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full"
+                              disabled={
+                                !statusDraft ||
+                                statusDraft === contactStatus(selected) ||
+                                updateStatusM.isPending
+                              }
+                              title={
+                                !statusDraft
+                                  ? 'Select a status to update'
+                                  : statusDraft === contactStatus(selected)
+                                    ? 'Status is already set to this value'
+                                    : undefined
+                              }
+                              onClick={() => {
+                                const id = rowId(selected);
+                                if (!id || !statusDraft) return;
+                                updateStatusM.mutate({ id, status: statusDraft });
+                              }}
+                            >
+                              Update status
+                            </Button>
+                            {!statusDraft || statusDraft === contactStatus(selected) ? (
+                              <p className="text-[11px] leading-snug text-muted-foreground">
+                                {!statusDraft
+                                  ? 'Select a status to enable update.'
+                                  : 'Pick a different status to save a change.'}
+                              </p>
+                            ) : null}
+                          </div>
                         </div>
 
                         <dl className="space-y-2 text-sm">

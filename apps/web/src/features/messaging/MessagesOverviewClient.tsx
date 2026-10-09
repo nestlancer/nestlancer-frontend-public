@@ -16,7 +16,7 @@ import { formatRelativeTime } from '@nestlancer/utils';
 import { ClientListPage } from '@/components/web/ClientListPage';
 import { WebPanel } from '@/components/web/WebPanel';
 import { apiServices } from '@/lib/axios';
-import { webPrimaryButtonClass } from '@/lib/tailadmin-classes';
+import { webMetricStripClass, webPrimaryButtonClass } from '@/lib/tailadmin-classes';
 
 import {
   conversationHref,
@@ -80,9 +80,9 @@ function MessagesOverviewInner() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <OverviewStat label="Open conversations" value={items.length} hint="Active threads" />
-        <OverviewStat
+      <div className={cn(webMetricStripClass, 'sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-3')}>
+        <OverviewStripCell label="Open conversations" value={items.length} hint="Active threads" />
+        <OverviewStripCell
           label="Unread messages"
           value={totalUnread}
           hint={
@@ -94,7 +94,7 @@ function MessagesOverviewInner() {
           }
           accent={totalUnread > 0}
         />
-        <OverviewStat
+        <OverviewStripCell
           label="Unread threads"
           value={unreadThreads}
           hint={unreadThreads > 0 ? 'Needs a reply' : 'None waiting'}
@@ -151,11 +151,11 @@ function MessagesOverviewInner() {
                 <li key={row.id}>
                   <Link
                     href={conversationHref(row)}
-                    className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-muted/40 sm:px-5"
+                    className="flex items-start gap-3 px-4 py-2.5 transition-colors hover:bg-muted/40 sm:px-5"
                   >
                     <span
                       className={cn(
-                        'mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold',
+                        'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold',
                         unread ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
                       )}
                       aria-hidden
@@ -210,7 +210,7 @@ export function MessagesOverviewClient() {
       fallback={
         <div className="space-y-4">
           <Skeleton className="h-10 w-48" />
-          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-xl" />
         </div>
       }
     >
@@ -219,7 +219,7 @@ export function MessagesOverviewClient() {
   );
 }
 
-function OverviewStat({
+function OverviewStripCell({
   label,
   value,
   hint,
@@ -233,18 +233,18 @@ function OverviewStat({
   warn?: boolean;
 }) {
   return (
-    <WebPanel padding="sm">
-      <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{label}</p>
+    <div className="flex min-w-0 flex-col justify-center px-3.5 py-2.5">
+      <p className="truncate text-[11px] font-medium text-gray-500 dark:text-gray-400">{label}</p>
       <p
         className={cn(
-          'mt-1 text-2xl font-bold tracking-tight tabular-nums text-gray-900 dark:text-white',
+          'mt-1 text-lg font-semibold tracking-tight tabular-nums text-gray-900 dark:text-white/90 sm:text-xl',
           accent && 'text-ta-brand-500',
           warn && !accent && 'text-destructive'
         )}
       >
         {value}
       </p>
-      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{hint}</p>
-    </WebPanel>
+      <p className="mt-0.5 truncate text-[11px] text-gray-500 dark:text-gray-400">{hint}</p>
+    </div>
   );
 }

@@ -115,21 +115,23 @@ function AdminNavLink({
       href={href}
       onClick={onNavigate}
       title={collapsed ? label : undefined}
+      aria-label={label}
+      aria-current={active ? 'page' : undefined}
       className={cn(
-        'group relative mx-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-normal transition-theme',
+        'group relative mx-1 flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-theme',
         active
           ? 'bg-[var(--ge-sidebar-active)] text-[var(--ge-sidebar-text-active)]'
-          : 'text-[var(--ge-sidebar-text)] hover:bg-[var(--ge-sidebar-hover)] hover:text-[var(--ge-sidebar-text-active)]',
+          : 'font-normal text-[var(--ge-sidebar-text)] hover:bg-[var(--ge-sidebar-hover)] hover:text-foreground',
         collapsed && 'mx-0 justify-center px-2'
       )}
     >
-      {active ? (
+      {active && !collapsed ? (
         <span
-          className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[var(--ge-primary)]"
+          className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-[var(--ge-primary)]"
           aria-hidden
         />
       ) : null}
-      <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
+      <Icon className="h-4 w-4 shrink-0" aria-hidden />
       {!collapsed ? <span className="truncate">{label}</span> : null}
     </Link>
   );
@@ -252,7 +254,7 @@ export function AdminConsoleLayout({ children }: { children: ReactNode }) {
           {/* Desktop sidebar */}
           <aside
             className={cn(
-              'ge-sidebar h-full shrink-0 flex-col overflow-hidden border-r border-[var(--ge-sidebar-border)] shadow-lg transition-[width] duration-200',
+              'ge-sidebar h-full shrink-0 flex-col overflow-hidden border-r border-[var(--ge-sidebar-border)] shadow-none transition-[width] duration-200',
               'hidden lg:flex',
               sidebarCollapsed ? 'w-[var(--sidebar-rail-width)]' : 'w-[var(--sidebar-width)]'
             )}
@@ -269,7 +271,7 @@ export function AdminConsoleLayout({ children }: { children: ReactNode }) {
                 </div>
                 {!sidebarCollapsed ? (
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-[var(--ge-sidebar-text-active)]">
+                    <p className="truncate text-xs font-medium text-foreground">
                       {user?.email ?? '—'}
                     </p>
                     <Text className="text-[10px] text-[var(--ge-sidebar-text)]">Administrator</Text>
@@ -280,9 +282,12 @@ export function AdminConsoleLayout({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={() => void handleLogout()}
                 title="Sign out"
+                aria-label="Sign out"
                 className={cn(
-                  'mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-[var(--ge-primary)] py-2 text-xs font-semibold text-white transition-theme hover:opacity-90',
-                  sidebarCollapsed && 'px-0'
+                  'mt-1.5 flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium',
+                  'text-[var(--ge-sidebar-text)] transition-colors',
+                  'hover:bg-[var(--ge-sidebar-hover)] hover:text-foreground',
+                  sidebarCollapsed && 'justify-center px-0'
                 )}
               >
                 <LogOut className="h-3.5 w-3.5" aria-hidden />
@@ -300,13 +305,13 @@ export function AdminConsoleLayout({ children }: { children: ReactNode }) {
                 aria-label="Close navigation menu"
                 onClick={() => setMobileNavOpen(false)}
               />
-              <aside className="ge-sidebar relative flex h-full w-[min(100%,var(--sidebar-width))] flex-col shadow-xl">
+              <aside className="ge-sidebar relative flex h-full w-[min(100%,var(--sidebar-width))] flex-col shadow-none">
                 <AdminSidebarBrand
                   actions={
                     <button
                       type="button"
                       onClick={() => setMobileNavOpen(false)}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[var(--ge-sidebar-text)] hover:bg-[var(--ge-sidebar-hover)] hover:text-[var(--ge-sidebar-text-active)]"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[var(--ge-sidebar-text)] hover:bg-[var(--ge-sidebar-hover)] hover:text-foreground"
                       aria-label="Close menu"
                     >
                       <X className="h-5 w-5" />
@@ -321,7 +326,7 @@ export function AdminConsoleLayout({ children }: { children: ReactNode }) {
                       <span className="online" aria-hidden />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium text-[var(--ge-sidebar-text-active)]">
+                      <p className="truncate text-xs font-medium text-foreground">
                         {user?.email ?? '—'}
                       </p>
                       <Text className="text-[10px] text-[var(--ge-sidebar-text)]">
@@ -332,7 +337,7 @@ export function AdminConsoleLayout({ children }: { children: ReactNode }) {
                   <button
                     type="button"
                     onClick={() => void handleLogout()}
-                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-[var(--ge-primary)] py-2 text-xs font-semibold text-white transition-theme hover:opacity-90"
+                    className="mt-1.5 flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-[var(--ge-sidebar-text)] transition-colors hover:bg-[var(--ge-sidebar-hover)] hover:text-foreground"
                   >
                     <LogOut className="h-3.5 w-3.5" aria-hidden />
                     Sign out

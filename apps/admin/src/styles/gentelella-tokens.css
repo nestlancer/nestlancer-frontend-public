@@ -32,9 +32,9 @@
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --sidebar-width: 252px;
-  --sidebar-rail-width: 64px;
-  --header-height: 56px;
+  --sidebar-width: 228px;
+  --sidebar-rail-width: 56px;
+  --header-height: 52px;
   /* Admin console uses full fluid width; no center column cap */
   --content-max-width: none;
 
@@ -43,15 +43,18 @@
   --radius-lg: 8px;
   --radius: var(--radius-md);
 
-  --ge-shadow-card: 0 1px 2px hsl(216 24% 16% / 0.06);
-  --ge-sidebar-bg: hsl(var(--surface));
+  --ge-shadow-card: none;
+  /* Dimmer recessed rail (Linear 2026) — content canvas wins */
+  --ge-sidebar-bg: hsl(220 20% 96%);
   --ge-sidebar-text: hsl(var(--muted-foreground));
-  --ge-sidebar-text-active: hsl(var(--foreground));
+  /* Ghost active: tinted primary text + soft fill (AA on light rail) */
+  --ge-sidebar-text-active: hsl(var(--primary));
   --ge-sidebar-active: hsl(var(--primary) / 0.1);
   --ge-sidebar-border: hsl(var(--border));
-  --ge-sidebar-hover: hsl(var(--muted) / 0.65);
-  --ge-sidebar-section: hsl(var(--muted-foreground));
+  --ge-sidebar-hover: hsl(var(--muted) / 0.8);
+  --ge-sidebar-section: hsl(215 10% 46%);
   --ge-primary: hsl(var(--primary));
+  --ge-canvas: #ffffff;
   --status-info: 217 91% 60%;
   --status-info-bg: 217 91% 60% / 0.1;
   --status-success: 160 84% 39%;
@@ -63,8 +66,7 @@
   --status-purple: 262 83% 58%;
   --status-purple-bg: 262 83% 58% / 0.1;
 
-  --ge-canvas: #f5f7fa;
-  --ge-chart-tab-shadow: 0 1px 2px hsl(216 24% 16% / 0.06);
+  --ge-chart-tab-shadow: none;
 }
 
 .dark {
@@ -93,14 +95,14 @@
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --ge-shadow-card: 0 1px 3px hsl(0 0% 0% / 0.35);
-  --ge-sidebar-bg: #1a2332;
+  --ge-shadow-card: none;
+  --ge-sidebar-bg: hsl(216 28% 11%);
   --ge-sidebar-text: #7b8fa3;
-  --ge-sidebar-text-active: #ffffff;
-  --ge-sidebar-active: rgba(14, 141, 114, 0.08);
+  --ge-sidebar-text-active: hsl(168 70% 72%);
+  --ge-sidebar-active: hsl(var(--primary) / 0.18);
   --ge-sidebar-border: hsl(0 0% 100% / 0.08);
   --ge-sidebar-hover: hsl(0 0% 100% / 0.05);
   --ge-sidebar-section: #94a3b8;
   --ge-canvas: hsl(var(--background));
-  --ge-chart-tab-shadow: 0 1px 3px hsl(0 0% 0% / 0.35);
+  --ge-chart-tab-shadow: none;
 }

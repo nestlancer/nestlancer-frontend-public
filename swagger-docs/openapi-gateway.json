@@ -42323,6 +42323,65 @@
         },
         "description": "Gateway admin route proxied to payments service."
       }
+    },
+    "/api/v1/system/status": {
+      "get": {
+        "operationId": "SystemStatusController_getStatus",
+        "tags": [
+          "System"
+        ],
+        "summary": "Public platform status",
+        "description": "Returns maintenance mode state for client splash / banner screens.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/end-impersonation": {
+      "post": {
+        "operationId": "AuthController_endOwnImpersonation",
+        "tags": [
+          "auth"
+        ],
+        "summary": "End own impersonation session",
+        "description": "Client-portal support sessions call this on Stop and return so the server grant ends without relying on the admin tab.",
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
     }
   },
   "tags": [

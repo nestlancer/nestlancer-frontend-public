@@ -2,21 +2,19 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { cloneElement, useEffect, useId, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@nestlancer/ui';
 
 import { getApiErrorMessage } from '@nestlancer/api-client';
 import { Button, Input } from '@nestlancer/ui';
 
-import { AdminQueryState } from '@/components/admin/AdminConsolePrimitives';
+import { AdminQueryState, AdminSection } from '@/components/admin/AdminConsolePrimitives';
 import { PageHeader } from '@/components/admin/AdminDataViews';
-import { adminCardClass } from '@/components/admin/AdminPageChrome';
 import { AdminPortfolioMediaPanel } from '@/features/portfolio/AdminPortfolioMediaPanel';
 import { adminKeys } from '@/lib/admin-query-keys';
 import { pickAdminRecord, pickAdminRows } from '@/lib/admin-response';
 import { apiServices } from '@/lib/axios';
-import { cn } from '@nestlancer/ui';
 
 function parseTags(raw: unknown): string {
   if (!Array.isArray(raw)) return '';
@@ -240,16 +238,13 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
 
       <AdminQueryState isLoading={isEdit && detailQ.isPending} error={detailQ.error}>
         <form
-          className="max-w-3xl space-y-8"
+          className="max-w-3xl space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
             saveM.mutate();
           }}
         >
-          <section className={cn(adminCardClass, 'space-y-4')}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Content
-            </h2>
+          <AdminSection title="Content" className="space-y-4">
             <Field label="Title" required>
               <Input
                 value={title}
@@ -296,12 +291,9 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
                 placeholder="Write the case study in Markdown…"
               />
             </Field>
-          </section>
+          </AdminSection>
 
-          <section className={cn(adminCardClass, 'space-y-4')}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Classification
-            </h2>
+          <AdminSection title="Classification" className="space-y-4">
             <Field label="Category">
               <select
                 value={categoryId}
@@ -332,16 +324,13 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
               />
               Featured on homepage
             </label>
-          </section>
+          </AdminSection>
 
-          <section className={cn(adminCardClass, 'space-y-4')}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Client (marketing only)
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Display name and context for the case study. Use a confidential label when the real
-              client should stay private.
-            </p>
+          <AdminSection
+            title="Client (marketing only)"
+            description="Display name and context for the case study. Use a confidential label when the real client should stay private."
+            className="space-y-4"
+          >
             <Field label="Client name">
               <Input
                 value={clientName}
@@ -366,28 +355,21 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
                 placeholder="https://"
               />
             </Field>
-          </section>
+          </AdminSection>
 
-          <section className={cn(adminCardClass, 'space-y-4')}>
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  Client review
-                </h2>
-                <p className="mt-1 max-w-xl text-xs text-muted-foreground">
-                  Curate a public review for this showcase. You enter the quote and attribution — it
-                  does not need to come from the client portal.
-                </p>
-              </div>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={reviewEnabled}
-                  onChange={(e) => setReviewEnabled(e.target.checked)}
-                />
-                Show on public showcase
-              </label>
-            </div>
+          <AdminSection
+            title="Client review"
+            description="Curate a public review for this showcase. You enter the quote and attribution — it does not need to come from the client portal."
+            className="space-y-4"
+          >
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={reviewEnabled}
+                onChange={(e) => setReviewEnabled(e.target.checked)}
+              />
+              Show on public showcase
+            </label>
 
             {reviewEnabled ? (
               <div className="space-y-4">
@@ -456,12 +438,9 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
                 page.
               </p>
             )}
-          </section>
+          </AdminSection>
 
-          <section className={cn(adminCardClass, 'space-y-4')}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Project details
-            </h2>
+          <AdminSection title="Project details" className="space-y-4">
             <Field label="Duration">
               <Input
                 value={duration}
@@ -478,12 +457,9 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
                 placeholder="Next.js, Razorpay, Shopify"
               />
             </Field>
-          </section>
+          </AdminSection>
 
-          <section className={cn(adminCardClass, 'space-y-4')}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Links
-            </h2>
+          <AdminSection title="Links" className="space-y-4">
             <Field label="Live URL">
               <Input
                 value={liveUrl}
@@ -500,14 +476,11 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
                 placeholder="https://github.com/…"
               />
             </Field>
-          </section>
+          </AdminSection>
 
           {isEdit && itemId ? <AdminPortfolioMediaPanel itemId={itemId} /> : null}
 
-          <section className={cn(adminCardClass, 'space-y-4')}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              SEO
-            </h2>
+          <AdminSection title="SEO" className="space-y-4">
             <Field label="Meta title">
               <Input
                 value={metaTitle}
@@ -524,15 +497,16 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
                 placeholder="155 characters that sell the click"
               />
             </Field>
-          </section>
+          </AdminSection>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="h-16" aria-hidden />
+          <div className="sticky bottom-0 z-20 -mx-1 flex flex-wrap gap-2 border-t border-border/70 bg-background/95 px-1 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/85">
             <Button
               type="submit"
               disabled={
                 saveM.isPending || !title.trim() || (reviewEnabled && !testimonialQuote.trim())
               }
-              className="rounded-lg"
+              className="rounded-md"
             >
               {saveM.isPending ? 'Saving…' : isEdit ? 'Save changes' : 'Create item'}
             </Button>
@@ -540,7 +514,7 @@ export function AdminPortfolioEditorClient({ itemId }: { itemId?: string }) {
               <Button
                 type="button"
                 variant="secondary"
-                className="rounded-lg"
+                className="rounded-md"
                 disabled={publishM.isPending}
                 onClick={() => publishM.mutate()}
               >
@@ -561,40 +535,53 @@ function Field({
 }: {
   label: string;
   required?: boolean;
-  children: React.ReactNode;
+  children: React.ReactElement;
 }) {
+  const id = useId();
+  const controlId = (children.props as { id?: string }).id ?? id;
   return (
     <div>
-      <label className="text-xs font-medium text-muted-foreground">
+      <label htmlFor={controlId} className="text-xs font-medium text-muted-foreground">
         {label}
         {required ? ' *' : ''}
       </label>
-      <div className="mt-1">{children}</div>
+      <div className="mt-1">
+        {cloneElement(children, {
+          id: controlId,
+          ...(required ? { 'aria-required': true } : {}),
+        } as Record<string, unknown>)}
+      </div>
     </div>
   );
 }
 
 function TextArea({
+  id,
   value,
   onChange,
   rows = 4,
   mono,
   required,
   placeholder,
+  'aria-required': ariaRequired,
 }: {
+  id?: string;
   value: string;
   onChange: (v: string) => void;
   rows?: number;
   mono?: boolean;
   required?: boolean;
   placeholder?: string;
+  'aria-required'?: boolean;
 }) {
   return (
     <textarea
+      id={id}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       rows={rows}
       required={required}
+      aria-required={ariaRequired}
       placeholder={placeholder}
       className={`w-full rounded-lg border border-border/70 bg-background px-3 py-2 text-sm ${mono ? 'font-mono' : ''}`}
     />

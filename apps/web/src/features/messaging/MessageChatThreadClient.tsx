@@ -82,7 +82,7 @@ export function MessageChatThreadClient({ threadId }: { threadId: string }) {
     () => getAccessToken() ?? undefined
   );
   const markedReadRef = useRef(false);
-  const { uploadAsync, isUploading } = useMediaUpload();
+  const { uploadAsync, isUploading } = useMediaUpload({ successToast: false });
 
   useEffect(() => {
     setAccessToken(getAccessToken() ?? undefined);
@@ -350,15 +350,20 @@ export function MessageChatThreadClient({ threadId }: { threadId: string }) {
                   }
                   onCancelReply={() => setReplyToId(null)}
                   onSendFile={async (file, caption) => {
-                    const result = await uploadAsync({ file, threadId });
-                    await apiServices.messaging.sendChatThreadMessage(threadId, {
-                      mediaId: result.mediaId,
-                      type: 'FILE',
-                      ...(caption ? { content: caption } : {}),
-                      ...(replyToId ? { replyToId } : {}),
-                    });
-                    setReplyToId(null);
-                    invalidateFromRealtime();
+                    try {
+                      const result = await uploadAsync({ file, threadId });
+                      await apiServices.messaging.sendChatThreadMessage(threadId, {
+                        mediaId: result.mediaId,
+                        type: 'FILE',
+                        ...(caption ? { content: caption } : {}),
+                        ...(replyToId ? { replyToId } : {}),
+                      });
+                      setReplyToId(null);
+                      invalidateFromRealtime();
+                      toast.success('File sent');
+                    } catch (e) {
+                      toast.error(getApiErrorMessage(e, 'Could not send file'));
+                    }
                   }}
                 />
               </div>

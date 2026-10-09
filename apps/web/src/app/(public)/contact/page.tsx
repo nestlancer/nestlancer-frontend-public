@@ -45,7 +45,7 @@ export default function ContactPage() {
           <ZigReveal index={1} className="space-y-4">
             <EngineeredPanel className="p-5">
               <h2 className="text-sm font-semibold">Studio</h2>
-              <p className="mt-2 text-sm text-muted-foreground">hello@nestlancer.com</p>
+              <p className="mt-2 text-sm text-muted-foreground">contact@nestlancer.com</p>
               <span className="mt-3 inline-flex rounded-full border border-[hsl(var(--success)/0.3)] bg-[hsl(var(--success)/0.08)] px-2.5 py-1 text-xs font-semibold text-[hsl(var(--success))]">
                 Typical reply &lt; 24h
               </span>

@@ -24,7 +24,7 @@ Nestlancer is a dedicated product studio for founders, startups, and product tea
 - [Services](https://nestlancer.com/services): Packages and deliverables
 - [Pricing](https://nestlancer.com/pricing): Transparent studio engagements (no SaaS subscription trap)
 - [About](https://nestlancer.com/about): Studio mission, workflow, and values
-- [Contact](https://nestlancer.com/contact): Project inquiries and partnerships (hello@nestlancer.com)
+- [Contact](https://nestlancer.com/contact): Project inquiries and partnerships (contact@nestlancer.com)
 
 ## Client portal
 

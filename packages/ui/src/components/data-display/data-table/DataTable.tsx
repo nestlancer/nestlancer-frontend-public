@@ -32,6 +32,8 @@ export type DataTableProps<T> = {
   pagination?: Omit<PaginationProps, 'className'>;
   sort?: { columnId: string; direction: SortDirection };
   onSortChange?: (columnId: string, direction: SortDirection) => void;
+  /** Optional row activation (e.g. navigate to detail). Checkbox cells should stopPropagation. */
+  onRowClick?: (row: T) => void;
   className?: string;
 };
 
@@ -49,6 +51,7 @@ export function DataTable<T>({
   pagination,
   sort,
   onSortChange,
+  onRowClick,
   className,
 }: DataTableProps<T>) {
   const handleSort = useCallback(
@@ -113,7 +116,23 @@ export function DataTable<T>({
               {rows.map((row) => (
                 <tr
                   key={getRowId(row)}
-                  className="border-b border-border/50 transition-theme hover:bg-muted/30"
+                  className={cn(
+                    'border-b border-border/50 transition-theme hover:bg-muted/30',
+                    onRowClick ? 'cursor-pointer' : undefined
+                  )}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            onRowClick(row);
+                          }
+                        }
+                      : undefined
+                  }
+                  tabIndex={onRowClick ? 0 : undefined}
+                  role={onRowClick ? 'link' : undefined}
                 >
                   {columns.map((col) => (
                     <td key={col.id} className={cn('px-4 py-3', col.className)}>

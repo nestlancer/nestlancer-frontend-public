@@ -989,3 +989,65 @@ export const useAuthAuthPublicControllerVerifyEmail = <
 
   return useMutation(mutationOptions);
 };
+/**
+ * Client-portal support sessions call this on Stop and return so the server grant ends without relying on the admin tab.
+ * @summary End own impersonation session
+ */
+export const authControllerEndOwnImpersonation = () => {
+  return customInstance<void>({ url: `/api/v1/auth/end-impersonation`, method: 'POST' });
+};
+
+export const getAuthControllerEndOwnImpersonationMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerEndOwnImpersonation>>,
+    TError,
+    void,
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof authControllerEndOwnImpersonation>>,
+  TError,
+  void,
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof authControllerEndOwnImpersonation>>,
+    void
+  > = () => {
+    return authControllerEndOwnImpersonation();
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AuthControllerEndOwnImpersonationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authControllerEndOwnImpersonation>>
+>;
+
+export type AuthControllerEndOwnImpersonationMutationError = void;
+
+/**
+ * @summary End own impersonation session
+ */
+export const useAuthControllerEndOwnImpersonation = <TError = void, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerEndOwnImpersonation>>,
+    TError,
+    void,
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof authControllerEndOwnImpersonation>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationOptions = getAuthControllerEndOwnImpersonationMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};

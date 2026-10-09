@@ -24,9 +24,6 @@ import { useRegister } from '../hooks/useRegister';
 
 export function RegisterForm() {
   const registerMutation = useRegister();
-  const [emailAvailability, setEmailAvailability] = useState<'unknown' | 'available' | 'taken'>(
-    'unknown'
-  );
   const [emailChecking, setEmailChecking] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const onTurnstileToken = useCallback((token: string | null) => {
@@ -50,7 +47,6 @@ export function RegisterForm() {
     async (email: string) => {
       const trimmed = email.trim();
       if (!trimmed || !trimmed.includes('@')) {
-        setEmailAvailability('unknown');
         return;
       }
       setEmailChecking(true);
@@ -65,14 +61,14 @@ export function RegisterForm() {
           email: trimmed,
           turnstileToken: token,
         });
-        setEmailAvailability(result.available ? 'available' : 'taken');
-        if (!result.available) {
-          form.setError('email', { message: 'This email is already registered' });
-        } else {
-          form.clearErrors('email');
+        // Backend is format-only (anti-enumeration). Never claim "available".
+        if (!result.valid) {
+          form.setError('email', { message: 'Enter a valid email address' });
+          return;
         }
+        form.clearErrors('email');
       } catch {
-        setEmailAvailability('unknown');
+        /* ignore — register submit still validates */
       } finally {
         setEmailChecking(false);
       }
@@ -82,6 +78,7 @@ export function RegisterForm() {
 
   return (
     <form
+      method="post"
       className="space-y-3 sm:space-y-5"
       onSubmit={form.handleSubmit((values) => {
         let token: string;
@@ -152,11 +149,7 @@ export function RegisterForm() {
             onBlur: (e) => void checkEmailAvailability(e.target.value),
           })}
         />
-        {emailChecking ? (
-          <p className="text-xs text-muted-foreground">Checking availability…</p>
-        ) : emailAvailability === 'available' ? (
-          <p className="text-xs text-emerald-600">Email is available</p>
-        ) : null}
+        {emailChecking ? <p className="text-xs text-muted-foreground">Checking email…</p> : null}
         {form.formState.errors.email ? (
           <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
         ) : null}

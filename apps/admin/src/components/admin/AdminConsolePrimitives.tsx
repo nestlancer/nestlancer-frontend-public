@@ -18,12 +18,12 @@ export function AdminSection({
   children: ReactNode;
 }) {
   return (
-    <div className={cn('ge-card overflow-hidden', className)}>
-      <div className="border-b border-border px-4 py-3">
+    <div className={cn('border-l-2 border-primary/35 pl-3', className)}>
+      <div className="pb-1.5">
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {description ? <p className="mt-0.5 text-xs text-muted-foreground">{description}</p> : null}
       </div>
-      <div className="p-4">{children}</div>
+      <div className="space-y-2.5 py-1">{children}</div>
     </div>
   );
 }

@@ -30,11 +30,18 @@ function hasIdempotencyKey(config: RetryConfig): boolean {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function isRetryableMethod(config: RetryConfig): boolean {
+/** Safe to replay after silent refresh (401) or gateway retry (502/503). */
+export function isRetryableRequest(
+  config: Pick<RetryConfig, 'method' | 'headers' | 'idempotent'>
+): boolean {
   const method = (config.method ?? 'get').toUpperCase();
   if (SAFE_METHODS.has(method)) return true;
   if (config.idempotent === true) return true;
   return hasIdempotencyKey(config);
+}
+
+function isRetryableMethod(config: RetryConfig): boolean {
+  return isRetryableRequest(config);
 }
 
 function shouldRetry(error: AxiosError, config: RetryConfig): boolean {

@@ -111,7 +111,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
               <ZigReveal index={1}>
                 <EngineeredPanel className="min-w-0 p-6">
                   <h2 className="text-sm font-semibold">Studio</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">hello@nestlancer.com</p>
+                  <p className="mt-2 text-sm text-muted-foreground">contact@nestlancer.com</p>
                   <p className="mt-1 text-sm text-muted-foreground">Typical reply &lt; 24h · IST</p>
                   <p className="mt-3 text-sm text-muted-foreground">
                     Prefer to browse first?{' '}

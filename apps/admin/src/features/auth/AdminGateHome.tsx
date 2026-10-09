@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { NestlancerLogo } from '@nestlancer/ui';
 import { Activity, Shield, Terminal, Cpu } from '@nestlancer/ui/icons';
+import { useAuth } from '@nestlancer/auth';
 
 import { OperatorBackdrop } from '@/components/auth/OperatorBackdrop';
 import { AdminThemeToggle } from '@/components/admin/AdminThemeToggle';
@@ -11,8 +13,16 @@ import { AdminThemeToggle } from '@/components/admin/AdminThemeToggle';
 import '@/styles/operator-portal.css';
 
 export function AdminGateHome() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
   const [uptime, setUptime] = useState('99.97%');
   const [syncAge, setSyncAge] = useState('12s');
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   useEffect(() => {
     let up = 99.97;
@@ -126,7 +136,7 @@ export function AdminGateHome() {
             </a>
           </div>
           <p className="op-audit">
-            Unauthorized access attempts are logged with IP, user-agent, and timestamp.{' '}
+            Failed sign-in attempts are logged with IP, user-agent, and timestamp.{' '}
             <span className="op-flash">Privileged actions require an active operator role.</span>
           </p>
         </section>

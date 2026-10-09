@@ -2,6 +2,7 @@ import type { AxiosInstance } from 'axios';
 
 import { BaseService } from './base.service';
 import { extractDocumentUrl } from '../utils/extract-document-url';
+import { withIdempotencyHeaders } from '../utils/idempotency-key';
 import { peelSuccessEnvelope } from '../utils/peel-success-envelope';
 import type {
   AdminBulkOperationResult,
@@ -223,6 +224,12 @@ export class AdminService extends BaseService {
     return data;
   }
 
+  /** System-wide audit trail (includes impersonation, admin mutations). */
+  async getSystemAuditLogs(params?: AdminQueryParams): Promise<unknown> {
+    const { data } = await this.client.get<unknown>(`/admin/audit`, { params });
+    return data;
+  }
+
   async getSecurityStats(params?: AdminQueryParams): Promise<unknown> {
     const { data } = await this.client.get<unknown>(`/admin/logs/security-stats`, { params });
     return data;
@@ -377,7 +384,8 @@ export class AdminService extends BaseService {
   ): Promise<unknown> {
     const { data } = await this.client.post<unknown>(
       `/admin/payments/${encodeURIComponent(String(id))}/refund`,
-      body
+      body,
+      withIdempotencyHeaders(`refund-${id}`)
     );
     return data;
   }
@@ -1415,7 +1423,11 @@ export class AdminService extends BaseService {
     amount?: number;
     notes?: string;
   }): Promise<unknown> {
-    const { data } = await this.client.post<unknown>(`/admin/payments/manual`, body);
+    const { data } = await this.client.post<unknown>(
+      `/admin/payments/manual`,
+      body,
+      withIdempotencyHeaders('manual-pay')
+    );
     return data;
   }
 

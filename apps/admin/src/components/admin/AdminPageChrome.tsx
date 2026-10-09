@@ -47,15 +47,82 @@ export function AdminMetricStrip({
   max = 6,
   className,
   heroIndex,
+  /**
+   * Single bordered shell with divided cells (2026 default).
+   * Pass `dense={false}` only for rare hero tile walls.
+   */
+  dense = true,
 }: {
   items: KpiItem[];
   max?: number;
   className?: string;
   /** Index of the oversized “north star” KPI (Stripe / Mercury pattern). */
   heroIndex?: number;
+  dense?: boolean;
 }) {
   const tiles = items.slice(0, max);
   if (!tiles.length) return null;
+
+  if (dense) {
+    const cols =
+      max <= 2
+        ? 'sm:grid-cols-2'
+        : max === 3
+          ? 'sm:grid-cols-3'
+          : max === 4
+            ? 'grid-cols-2 xl:grid-cols-4'
+            : 'grid-cols-2 md:grid-cols-3 xl:grid-cols-6';
+
+    return (
+      <div
+        className={cn(
+          'grid overflow-hidden rounded-md border border-border/60 bg-card/80',
+          'divide-x divide-y divide-border/50',
+          cols,
+          className
+        )}
+      >
+        {tiles.map((k, i) => {
+          const cell = (
+            <>
+              <p className="truncate text-[11px] font-medium text-muted-foreground">{k.label}</p>
+              <p className="mt-0.5 text-base font-semibold tabular-nums tracking-tight text-foreground">
+                {k.value}
+              </p>
+              {k.hint ? (
+                <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{k.hint}</p>
+              ) : null}
+              {k.delta ? (
+                <div className="mt-1">
+                  <BadgeDelta deltaType={k.delta.deltaType} size="sm">
+                    {k.delta.deltaType === 'increase'
+                      ? '↑'
+                      : k.delta.deltaType === 'decrease'
+                        ? '↓'
+                        : '→'}{' '}
+                    {k.delta.text}
+                  </BadgeDelta>
+                </div>
+              ) : null}
+            </>
+          );
+          const cellClass = 'px-3 py-2 transition-colors hover:bg-muted/30';
+          if (k.href) {
+            return (
+              <Link key={`${k.label}-${i}`} href={k.href} className={cn(cellClass, 'block')}>
+                {cell}
+              </Link>
+            );
+          }
+          return (
+            <div key={`${k.label}-${i}`} className={cellClass}>
+              {cell}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   const gridCols =
     max <= 2
@@ -67,7 +134,7 @@ export function AdminMetricStrip({
           : 'grid-cols-2 md:grid-cols-3 xl:grid-cols-6';
 
   return (
-    <div className={cn('grid gap-4', gridCols, className)}>
+    <div className={cn('grid gap-2', gridCols, className)}>
       {tiles.map((k, i) => {
         const Icon = METRIC_ICONS[i % METRIC_ICONS.length]!;
         const iconColor = METRIC_ICON_COLORS[i % METRIC_ICON_COLORS.length]!;
@@ -81,7 +148,7 @@ export function AdminMetricStrip({
             <div className="ge-kpi-tile-header">
               <span className="ge-kpi-tile-label">{k.label}</span>
               <span className={cn('ge-kpi-tile-icon', iconColor)}>
-                <Icon className="h-4 w-4" aria-hidden />
+                <Icon className="h-3.5 w-3.5" aria-hidden />
               </span>
             </div>
             <div>

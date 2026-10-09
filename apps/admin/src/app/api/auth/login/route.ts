@@ -8,7 +8,10 @@ import {
   gatewayLoginErrorResponse,
   isGateway2FAChallenge,
   logAuthEvent,
+  normalizeUserRole,
+  portalRoleMismatchResponse,
   postGatewayLogin,
+  roleFromAccessToken,
   type GatewayAuthTokens,
 } from '@nestlancer/auth';
 import { withRouteLog } from '@nestlancer/config/route-log.mjs';
@@ -68,29 +71,13 @@ async function postHandler(request: Request) {
     return NextResponse.json({ status: 'success', data });
   }
 
-  // Server-side role gate — never mint admin session cookies for non-ADMIN users.
-  const role = String((data.user as { role?: string } | undefined)?.role ?? '').toUpperCase();
-  if (role && role !== 'ADMIN') {
-    logAuthEvent({
-      event: 'auth.login',
-      request,
-      outcome: 'portal_mismatch',
-      portal: 'admin',
-      serviceFallback: SERVICE,
-      code: 'AUTH_PORTAL_MISMATCH',
-    });
-    return NextResponse.json(
-      {
-        message: 'This portal is for operators only. Use the client app to sign in.',
-        error: {
-          message: 'This portal is for operators only. Use the client app to sign in.',
-          code: 'AUTH_PORTAL_MISMATCH',
-        },
-        code: 'AUTH_PORTAL_MISMATCH',
-      },
-      { status: 403 }
-    );
-  }
+  const portalMismatch = portalRoleMismatchResponse(
+    request,
+    'admin',
+    normalizeUserRole(data.user) || roleFromAccessToken(data.accessToken),
+    SERVICE
+  );
+  if (portalMismatch) return portalMismatch;
 
   const rememberMe =
     typeof payload === 'object' &&

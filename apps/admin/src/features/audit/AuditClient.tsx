@@ -381,14 +381,20 @@ function ImpersonationSessionsSection({
 export function AuditClient() {
   const [auditSearch, setAuditSearch] = useState('');
   const [auditAction, setAuditAction] = useState('all');
+  const [systemAuditSearch, setSystemAuditSearch] = useState('');
+  const [systemAuditAction, setSystemAuditAction] = useState('all');
   const [userLogsSearch, setUserLogsSearch] = useState('');
   const [userLogsAction, setUserLogsAction] = useState('all');
   const [impersonationSearch, setImpersonationSearch] = useState('');
   const [impersonationStatus, setImpersonationStatus] = useState('all');
 
-  const [auditLogsQ, securityStatsQ, userLogsQ, impersonationQ] = useQueries({
+  const [auditLogsQ, systemAuditQ, securityStatsQ, userLogsQ, impersonationQ] = useQueries({
     queries: [
       { queryKey: adminKeys.auditLogs(), queryFn: () => apiServices.admin.getAuditLogs() },
+      {
+        queryKey: adminKeys.systemAuditLogs(),
+        queryFn: () => apiServices.admin.getSystemAuditLogs({ limit: 50 }),
+      },
       { queryKey: adminKeys.securityStats(), queryFn: () => apiServices.admin.getSecurityStats() },
       { queryKey: adminKeys.usersLogs(), queryFn: () => apiServices.admin.getUsersLogs() },
       {
@@ -405,6 +411,7 @@ export function AuditClient() {
 
   const debugPayloads = {
     auditLogs: auditLogsQ.data,
+    systemAuditLogs: systemAuditQ.data,
     securityStats: securityStatsQ.data,
     userAdminLogs: userLogsQ.data,
     impersonationSessions: impersonationQ.data,
@@ -415,7 +422,7 @@ export function AuditClient() {
       <PageHeader
         pretitle="System"
         title="Audit Logs"
-        description="Authentication logs, security aggregates, user-admin actions, and impersonation sessions."
+        description="Authentication logs, system audit (including impersonation), security aggregates, and sessions."
       />
 
       <div className="space-y-8">
@@ -439,8 +446,26 @@ export function AuditClient() {
         </section>
 
         <AuditTableSection
+          title="System audit logs"
+          description="GET /admin/audit — impersonation, admin mutations, and cross-service events"
+          scrollBody
+          data={systemAuditQ.data}
+          isLoading={systemAuditQ.isPending && systemAuditQ.data === undefined}
+          error={systemAuditQ.error}
+          onRetry={() => void systemAuditQ.refetch()}
+          search={systemAuditSearch}
+          onSearchChange={setSystemAuditSearch}
+          actionFilter={systemAuditAction}
+          onActionFilterChange={setSystemAuditAction}
+          onClear={() => {
+            setSystemAuditSearch('');
+            setSystemAuditAction('all');
+          }}
+        />
+
+        <AuditTableSection
           title="Auth audit logs"
-          description="GET /admin/logs"
+          description="GET /admin/logs — login, logout, and auth-category events"
           scrollBody
           data={auditLogsQ.data}
           isLoading={auditLogsQ.isPending && auditLogsQ.data === undefined}

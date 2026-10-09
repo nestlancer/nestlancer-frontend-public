@@ -2,14 +2,28 @@
   email {$LETSENCRYPT_EMAIL}
 }
 
+# F-S01-001: baseline browser security headers on every origin response (incl. 307s).
+(security_headers) {
+  header {
+    X-Content-Type-Options nosniff
+    X-Frame-Options DENY
+    Referrer-Policy strict-origin-when-cross-origin
+    Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  }
+}
+
 {$DEV_WEB_HOST} {
+  import security_headers
   reverse_proxy web:9000
 }
 
 {$DEV_ADMIN_HOST} {
+  import security_headers
   reverse_proxy admin:9010
 }
 
 {$DEV_LANDING_HOST} {
+  import security_headers
   reverse_proxy landing:9020
 }

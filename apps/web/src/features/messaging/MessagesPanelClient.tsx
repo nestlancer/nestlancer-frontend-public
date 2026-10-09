@@ -97,15 +97,15 @@ function MessagesPanelInner({ inbox = 'active' }: { inbox?: 'active' | 'archived
       <MessagingSplitWorkspace
         queue={<ClientInboxQueuePane initialInbox={inbox} />}
         context={
-          <div className="messaging-panel-elevated flex h-full min-h-0 flex-col gap-3 overflow-y-auto p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="messaging-panel-elevated flex h-full min-h-0 flex-col gap-1.5 overflow-y-auto p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               {isArchived ? 'Archive snapshot' : 'Inbox snapshot'}
             </p>
             <InboxStatRow label={isArchived ? 'Archived' : 'Open'} value={items.length} />
             <InboxStatRow label="Unread" value={totalUnread} accent={totalUnread > 0} />
             <InboxStatRow label="Waiting" value={unreadCount} warn={unreadCount > 0} />
-            <div className="mt-2 border-t border-border/60 pt-3">
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="mt-1.5 border-t border-border/50 pt-2">
+              <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 By type
               </p>
               <InboxStatRow label="Project" value={projectCount} muted />

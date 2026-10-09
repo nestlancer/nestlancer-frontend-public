@@ -691,7 +691,7 @@ export function SystemClient() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PageHeader
         pretitle="System"
         title="System Configuration"
@@ -712,7 +712,7 @@ export function SystemClient() {
         onChange={(index) => setActiveTab(SYSTEM_TABS[index]?.id ?? 'health')}
       />
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {loading ? <SkeletonTable rows={6} cols={3} /> : null}
         {sliceFaults.length === SLICE_NAMES.length ? (
           <ErrorState
@@ -929,6 +929,7 @@ export function SystemClient() {
                   value={configSearch}
                   onChange={(e) => setConfigSearch(e.target.value)}
                   placeholder="Search keys or labels…"
+                  aria-label="Search configuration keys or labels"
                   className="max-w-sm"
                 />
                 <p className="text-xs text-muted-foreground">
@@ -961,7 +962,7 @@ export function SystemClient() {
                   }
                 />
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {groupedConfig.map(([group, rows]) => (
                     <div key={group}>
                       <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -1089,6 +1090,7 @@ export function SystemClient() {
                 value={featureSearch}
                 onChange={(e) => setFeatureSearch(e.target.value)}
                 placeholder="Search by name, description, or id…"
+                aria-label="Search feature flags"
                 className="max-w-sm"
               />
             </div>
@@ -1249,6 +1251,11 @@ export function SystemClient() {
                 placeholder={
                   templatePane === 'email' ? 'Search email templates…' : 'Search notifications…'
                 }
+                aria-label={
+                  templatePane === 'email'
+                    ? 'Search email templates'
+                    : 'Search notification templates'
+                }
                 className="max-w-sm"
               />
             </div>
@@ -1366,27 +1373,32 @@ export function SystemClient() {
                       value={notifName}
                       onChange={(e) => setNotifName(e.target.value)}
                       placeholder="Template name"
+                      aria-label="Notification template name"
                     />
                     <Input
                       value={notifEventType}
                       onChange={(e) => setNotifEventType(e.target.value)}
                       placeholder="Event type (e.g. account.deleted)"
+                      aria-label="Notification event type"
                     />
                     <Input
                       value={notifTitleTemplate}
                       onChange={(e) => setNotifTitleTemplate(e.target.value)}
                       placeholder="Title template"
+                      aria-label="Notification title template"
                     />
                     <Textarea
                       value={notifMessageTemplate}
                       onChange={(e) => setNotifMessageTemplate(e.target.value)}
                       placeholder="Message template"
+                      aria-label="Notification message template"
                       className="min-h-[72px]"
                     />
                     <Textarea
                       value={notifChannelsJson}
                       onChange={(e) => setNotifChannelsJson(e.target.value)}
                       placeholder='Channels JSON e.g. ["IN_APP","EMAIL"]'
+                      aria-label="Notification channels JSON"
                       className="min-h-[56px] font-mono text-xs"
                     />
                     <Button
@@ -1548,8 +1560,14 @@ export function SystemClient() {
                   <div className="grid gap-0 lg:grid-cols-2">
                     <div className="space-y-3 border-b border-border p-5 lg:border-b-0 lg:border-r">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">Subject</label>
+                        <label
+                          htmlFor="email-template-subject"
+                          className="text-xs font-medium text-muted-foreground"
+                        >
+                          Subject
+                        </label>
                         <Input
+                          id="email-template-subject"
                           value={templateSubject}
                           onChange={(e) => {
                             setTemplateSubject(e.target.value);
@@ -1559,10 +1577,14 @@ export function SystemClient() {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">
+                        <label
+                          htmlFor="email-template-body"
+                          className="text-xs font-medium text-muted-foreground"
+                        >
                           Body (HTML or plain text)
                         </label>
                         <Textarea
+                          id="email-template-body"
                           value={templateBody}
                           onChange={(e) => {
                             setTemplateBody(e.target.value);
@@ -1626,6 +1648,7 @@ export function SystemClient() {
                       value={testEmailTo}
                       onChange={(e) => setTestEmailTo(e.target.value)}
                       placeholder="you@company.com"
+                      aria-label="Test email recipient"
                       className="max-w-xs"
                     />
                     <Button
@@ -1680,21 +1703,25 @@ export function SystemClient() {
                     value={notifName}
                     onChange={(e) => setNotifName(e.target.value)}
                     placeholder="Name"
+                    aria-label="Notification template name"
                   />
                   <Input
                     value={notifEventType}
                     onChange={(e) => setNotifEventType(e.target.value)}
                     placeholder="Event type"
+                    aria-label="Notification event type"
                   />
                   <Input
                     value={notifTitleTemplate}
                     onChange={(e) => setNotifTitleTemplate(e.target.value)}
                     placeholder="Title template"
+                    aria-label="Notification title template"
                   />
                   <Textarea
                     value={notifMessageTemplate}
                     onChange={(e) => setNotifMessageTemplate(e.target.value)}
                     placeholder="Message template"
+                    aria-label="Notification message template"
                     className="min-h-[96px]"
                   />
                   <Textarea
@@ -1702,6 +1729,7 @@ export function SystemClient() {
                     onChange={(e) => setNotifChannelsJson(e.target.value)}
                     className="min-h-[64px] font-mono text-xs"
                     placeholder='Channels JSON e.g. ["IN_APP","EMAIL"]'
+                    aria-label="Notification channels JSON"
                   />
                   <div className="flex flex-wrap justify-end gap-2 pt-1">
                     <Button size="sm" variant="outline" onClick={closeNotifEditor}>
@@ -1733,11 +1761,13 @@ export function SystemClient() {
                   value={announcementTitle}
                   onChange={(e) => setAnnouncementTitle(e.target.value)}
                   placeholder="Announcement title"
+                  aria-label="Announcement title"
                 />
                 <Textarea
                   value={announcementMessage}
                   onChange={(e) => setAnnouncementMessage(e.target.value)}
                   placeholder="Message body (max 1000 characters)"
+                  aria-label="Announcement message body"
                   className="min-h-[96px]"
                 />
                 <div className="flex flex-wrap items-center gap-4">
@@ -1748,6 +1778,7 @@ export function SystemClient() {
                       onChange={(e) =>
                         setAnnouncementType(e.target.value as 'INFO' | 'WARNING' | 'CRITICAL')
                       }
+                      aria-label="Announcement severity"
                       className="nl-select rounded-md border border-border bg-background py-1.5 text-sm min-w-[8rem]"
                     >
                       <option value="INFO">Info</option>
@@ -1759,6 +1790,7 @@ export function SystemClient() {
                     <Switch
                       checked={announcementDismissable}
                       onChange={setAnnouncementDismissable}
+                      aria-label="Users can dismiss announcement"
                     />
                     Users can dismiss
                   </label>
@@ -1794,7 +1826,11 @@ export function SystemClient() {
                   label="Enable maintenance"
                   description="Clients see a downtime screen. Public portfolio and blog stay readable."
                 >
-                  <Switch checked={maintenanceEnabled} onChange={setMaintenanceEnabled} />
+                  <Switch
+                    checked={maintenanceEnabled}
+                    onChange={setMaintenanceEnabled}
+                    aria-label="Enable maintenance mode"
+                  />
                 </SettingsRow>
                 <div className="space-y-1.5">
                   <p className="text-xs text-muted-foreground">Message shown to users</p>
@@ -1802,6 +1838,7 @@ export function SystemClient() {
                     value={maintenanceMessage}
                     onChange={(e) => setMaintenanceMessage(e.target.value)}
                     placeholder="System is under maintenance. Please check back later."
+                    aria-label="Maintenance message shown to users"
                   />
                 </div>
                 <div>
@@ -1810,6 +1847,7 @@ export function SystemClient() {
                     type="datetime-local"
                     value={maintenanceEstimatedEnd}
                     onChange={(e) => setMaintenanceEstimatedEnd(e.target.value)}
+                    aria-label="Estimated maintenance end"
                     className="max-w-xs"
                   />
                 </div>

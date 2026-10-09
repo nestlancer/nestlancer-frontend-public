@@ -53,8 +53,12 @@ export const queryKeys = {
     detail: (id: string) => ['invoices', 'detail', id] as const,
   },
   documents: {
-    verify: (documentNumber: string, token?: string) =>
-      ['documents', 'verify', documentNumber, token ?? ''] as const,
+    /**
+     * `tokenKey` must be a non-secret fingerprint (e.g. FNV hash), never the raw HMAC `t`.
+     * Pass the raw token only to the queryFn.
+     */
+    verify: (documentNumber: string, tokenKey = '') =>
+      ['documents', 'verify', documentNumber, tokenKey] as const,
   },
   users: {
     profile: ['users', 'profile'] as const,

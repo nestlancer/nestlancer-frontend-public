@@ -180,7 +180,7 @@ export function RequestsClient({ initialStatus }: { initialStatus?: string }) {
       <CapacityDashboard />
 
       <div className="space-y-6">
-        <AdminMetricStrip items={extractMetricTiles(statsQ.data, 'Requests')} max={4} />
+        <AdminMetricStrip items={extractMetricTiles(statsQ.data, 'Requests')} max={4} dense />
 
         <AdminDataShell
           filter={

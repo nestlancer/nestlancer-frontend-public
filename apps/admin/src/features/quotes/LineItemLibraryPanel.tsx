@@ -81,6 +81,15 @@ export function LineItemLibraryPanel({ onInsert }: LineItemLibraryPanelProps) {
     onError: (err) => toast.error(getApiErrorMessage(err)),
   });
 
+  const reactivateM = useMutation({
+    mutationFn: (id: string) => apiServices.admin.updateLineItemBlock(id, { isActive: true }),
+    onSuccess: () => {
+      toast.success('Block reactivated');
+      void qc.invalidateQueries({ queryKey: adminKeys.lineItemLibrary() });
+    },
+    onError: (err) => toast.error(getApiErrorMessage(err)),
+  });
+
   const rows = useMemo(() => {
     const raw = q.data;
     if (Array.isArray(raw)) return raw as LibraryRow[];
@@ -155,6 +164,15 @@ export function LineItemLibraryPanel({ onInsert }: LineItemLibraryPanelProps) {
                 onClick={() => deactivateM.mutate(id)}
               >
                 Deactivate
+              </Button>
+            ) : id ? (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={reactivateM.isPending}
+                onClick={() => reactivateM.mutate(id)}
+              >
+                Activate
               </Button>
             ) : null}
           </div>

@@ -15,6 +15,7 @@ import { Button, Input, TurnstileWidget } from '@nestlancer/ui';
 import { resetPasswordSchema, type ResetPasswordInput } from '@nestlancer/validators';
 import {
   SENSITIVE_SESSION_KEYS,
+  clearOneShotSessionValue,
   readOneShotSessionValue,
   stashSensitiveQueryParam,
 } from '@nestlancer/utils';
@@ -62,6 +63,7 @@ export function ResetPasswordClient() {
       });
     },
     onSuccess: () => {
+      clearOneShotSessionValue(SENSITIVE_SESSION_KEYS.resetPasswordToken);
       toast.success('Password updated. Please sign in.');
       router.push(routes.login);
     },

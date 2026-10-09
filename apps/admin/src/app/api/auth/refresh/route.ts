@@ -4,16 +4,15 @@ import { readAuthCookiesFromStore } from '@nestlancer/auth/server';
 import {
   assertSameOrigin,
   applyHttpOnlyAuthCookies,
+  buildGatewayLoginHeaders,
   clearHttpOnlyAuthCookies,
   getGatewayOrigin,
   logAuthEvent,
+  portalRoleMismatchResponse,
   resolveRememberMeFromRequest,
+  roleFromAccessToken,
   type GatewayAuthTokens,
 } from '@nestlancer/auth';
-import {
-  applyCorrelationHeaders,
-  resolveCorrelationId,
-} from '@nestlancer/config/correlation-id.mjs';
 import { withRouteLog } from '@nestlancer/config/route-log.mjs';
 
 const SERVICE = 'nl-prod-frontend-admin';
@@ -120,14 +119,7 @@ async function postHandler(request: Request) {
     return noSessionResponse();
   }
 
-  const headers = new Headers({ 'Content-Type': 'application/json' });
-  applyCorrelationHeaders(
-    headers,
-    resolveCorrelationId({
-      headers: request.headers,
-      cookieHeader: request.headers.get('cookie') ?? undefined,
-    })
-  );
+  const headers = new Headers(buildGatewayLoginHeaders(request));
 
   let gatewayRes: Response;
   try {
@@ -166,6 +158,24 @@ async function postHandler(request: Request) {
       );
     }
     if (isDefinitiveAuthRejection(gatewayRes.status)) {
+      const rejectReason =
+        payload.error?.details?.[0] &&
+        typeof payload.error.details[0] === 'object' &&
+        'reason' in payload.error.details[0]
+          ? String((payload.error.details[0] as { reason?: string }).reason ?? '')
+          : '';
+      if (!tokenFromBody && rejectReason === 'refreshReuse') {
+        logAuthEvent({
+          event: 'auth.refresh',
+          request,
+          outcome: 'upstream_error',
+          portal: 'admin',
+          upstreamStatus: gatewayRes.status,
+          serviceFallback: SERVICE,
+          code: 'AUTH_REFRESH_BUSY',
+        });
+        return transientUpstreamResponse(2);
+      }
       logAuthEvent({
         event: 'auth.refresh',
         request,
@@ -199,6 +209,18 @@ async function postHandler(request: Request) {
       serviceFallback: SERVICE,
     });
     return tokenFromBody ? unauthorizedRefreshResponse() : noSessionResponse();
+  }
+
+  // NL-BV-W7-03: same portal gate as login/verify-2fa — never mint admin cookies for clients.
+  const portalMismatch = portalRoleMismatchResponse(
+    request,
+    'admin',
+    roleFromAccessToken(tokens.accessToken),
+    SERVICE
+  );
+  if (portalMismatch) {
+    clearHttpOnlyAuthCookies(portalMismatch);
+    return portalMismatch;
   }
 
   logAuthEvent({

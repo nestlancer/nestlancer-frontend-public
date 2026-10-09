@@ -56,6 +56,7 @@ export function LoginForm() {
 
   return (
     <form
+      method="post"
       className="space-y-4"
       onSubmit={form.handleSubmit((values) => {
         const email = values.email.trim();

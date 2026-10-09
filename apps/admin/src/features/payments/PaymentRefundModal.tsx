@@ -16,6 +16,8 @@ import {
   Textarea,
 } from '@nestlancer/ui';
 
+import { toPaise } from '@nestlancer/utils';
+
 import { adminKeys } from '@/lib/admin-query-keys';
 import { apiServices } from '@/lib/axios';
 
@@ -39,9 +41,18 @@ export function PaymentRefundModal({
 
   const refundM = useMutation({
     mutationFn: () => {
+      // UI collects major currency units (same as manual payment); API expects paise.
+      let amountPaise: number | undefined;
+      if (partial.trim()) {
+        const rupees = Number(partial.trim());
+        if (!Number.isFinite(rupees) || rupees <= 0) {
+          throw new Error('Enter a valid refund amount in rupees');
+        }
+        amountPaise = toPaise(rupees);
+      }
       const body = {
         reason,
-        ...(partial.trim() ? { amount: Number(partial) } : {}),
+        ...(amountPaise != null ? { amount: amountPaise } : {}),
       };
       adminPaymentsDebug('refund:submit', { paymentId, body });
       return apiServices.admin.processPaymentRefund(paymentId, body);
@@ -70,11 +81,13 @@ export function PaymentRefundModal({
         <div className="mt-4 space-y-3">
           <div>
             <FormFieldLabel fieldKey="payments.refundAmount" label="Partial refund amount">
-              Partial amount (leave blank for full refund)
+              Partial amount in rupees (leave blank for full refund)
             </FormFieldLabel>
             <Input
               type="number"
               min={0}
+              step="0.01"
+              inputMode="decimal"
               placeholder={`Max: ${formatAdminCurrency(amount, currency)}`}
               value={partial}
               onChange={(e) => setPartial(e.target.value)}

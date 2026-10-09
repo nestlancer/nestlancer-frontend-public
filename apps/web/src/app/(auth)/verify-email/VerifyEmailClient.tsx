@@ -11,6 +11,7 @@ import { routes } from '@nestlancer/constants';
 import { Button } from '@nestlancer/ui';
 import {
   SENSITIVE_SESSION_KEYS,
+  clearOneShotSessionValue,
   readOneShotSessionValue,
   stashSensitiveQueryParam,
 } from '@nestlancer/utils';
@@ -65,10 +66,12 @@ export function VerifyEmailClient() {
     verifyMutation
       .mutateAsync(token)
       .then(() => {
+        clearOneShotSessionValue(SENSITIVE_SESSION_KEYS.verifyEmailToken);
         setStatus('success');
         setMessage('Your email is verified. You can now sign in.');
       })
       .catch((err: unknown) => {
+        clearOneShotSessionValue(SENSITIVE_SESSION_KEYS.verifyEmailToken);
         setStatus('error');
         setMessage(getApiErrorMessage(err, 'The verification link is invalid or has expired.'));
       });

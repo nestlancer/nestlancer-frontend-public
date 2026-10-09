@@ -140,7 +140,7 @@ export function QuotesClient({
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <AdminMetricStrip items={extractMetricTiles(statsQ.data, 'Quotes')} max={4} />
+          <AdminMetricStrip items={extractMetricTiles(statsQ.data, 'Quotes')} max={4} dense />
           <p className="text-xs text-muted-foreground">
             KPI totals include every quote status. The table below is filtered to{' '}
             <span className="font-medium text-foreground">

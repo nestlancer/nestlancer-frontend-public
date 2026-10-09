@@ -3,6 +3,7 @@ import type { AxiosInstance } from 'axios';
 
 import { BaseService } from './base.service';
 import { extractDocumentUrl } from '../utils/extract-document-url';
+import { withIdempotencyHeaders } from '../utils/idempotency-key';
 import { asPaginated, peelSuccessEnvelope } from '../utils/peel-success-envelope';
 import { unwrapGatewayBody } from '../utils/unwrap-gateway-body';
 
@@ -44,7 +45,8 @@ export class QuotesService extends BaseService {
   async accept(id: string, body?: Record<string, unknown>): Promise<unknown> {
     const { data } = await this.client.post<unknown>(
       `/quotes/${encodeURIComponent(id)}/accept`,
-      body ?? {}
+      body ?? {},
+      withIdempotencyHeaders(`quote-accept-${id}`)
     );
     return peelSuccessEnvelope(data);
   }
@@ -52,7 +54,8 @@ export class QuotesService extends BaseService {
   async decline(id: string, body?: Record<string, unknown>): Promise<unknown> {
     const { data } = await this.client.post<unknown>(
       `/quotes/${encodeURIComponent(id)}/decline`,
-      body ?? {}
+      body ?? {},
+      withIdempotencyHeaders(`quote-decline-${id}`)
     );
     return peelSuccessEnvelope(data);
   }

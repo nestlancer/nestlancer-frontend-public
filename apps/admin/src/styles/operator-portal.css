@@ -11,9 +11,10 @@
   --op-text: #0f172a;
   --op-muted: #5b6b7c;
   --op-faint: #8494a7;
-  --op-teal: #0f9f84;
-  --op-teal-bright: #0b7d68;
-  --op-teal-dim: rgba(15, 159, 132, 0.12);
+  --op-teal: #0b7d68;
+  --op-teal-bright: #086557;
+  --op-teal-dim: rgba(11, 125, 104, 0.12);
+  --op-teal-link: #086557;
   --op-ok: #16a34a;
   --op-ok-text: #166534;
   --op-ok-border: rgba(22, 163, 74, 0.35);
@@ -64,6 +65,7 @@ html.dark .op-portal {
   --op-teal: #1fad8f;
   --op-teal-bright: #3fe0bb;
   --op-teal-dim: rgba(31, 173, 143, 0.14);
+  --op-teal-link: #3fe0bb;
   --op-ok: #22c55e;
   --op-ok-text: #86efac;
   --op-ok-border: rgba(34, 197, 94, 0.35);
@@ -184,7 +186,7 @@ html.dark .op-portal {
 }
 
 .op-portal .op-banner a {
-  color: var(--op-teal);
+  color: var(--op-teal-link, var(--op-teal-bright));
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -1341,7 +1343,7 @@ html.dark .op-portal {
 }
 
 .op-portal .op-foot a {
-  color: var(--op-teal);
+  color: var(--op-teal-link, var(--op-teal-bright));
 }
 
 .op-portal .op-foot a:hover {
@@ -1379,7 +1381,7 @@ html.dark .op-portal {
 }
 
 .op-portal .op-back a:hover {
-  color: var(--op-teal);
+  color: var(--op-teal-link, var(--op-teal-bright));
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -1411,7 +1413,7 @@ html.dark .op-portal {
 }
 
 .op-portal .op-login-legal a {
-  color: var(--op-teal);
+  color: var(--op-teal-link, var(--op-teal-bright));
   text-decoration: underline;
   text-underline-offset: 2px;
 }

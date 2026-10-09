@@ -104,7 +104,7 @@ export function organizationJsonLd() {
     image: absoluteUrl(BRAND.ogImagePath),
     areaServed: [...BRAND.areaServed],
     priceRange: '₹₹',
-    email: 'hello@nestlancer.com',
+    email: 'contact@nestlancer.com',
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: 'Nestlancer studio services',

@@ -10,7 +10,9 @@ import {
   getGatewayOrigin,
   IMPERSONATION_COOKIE,
   logAuthEvent,
+  portalRoleMismatchResponse,
   resolveRememberMeFromRequest,
+  roleFromAccessToken,
   type GatewayAuthTokens,
 } from '@nestlancer/auth';
 import { withRouteLog } from '@nestlancer/config/route-log.mjs';
@@ -169,7 +171,27 @@ async function postHandler(request: Request) {
       );
     }
     // Cookie-only silent refresh: clear session only on definitive auth rejection.
+    // refreshReuse from a raced sibling must not Set-Cookie-clear over the winner
+    // (NL-BUG-SESSION-01) — keep cookies and signal transient so the client retries.
     if (isDefinitiveAuthRejection(gatewayRes.status)) {
+      const rejectReason =
+        payload.error?.details?.[0] &&
+        typeof payload.error.details[0] === 'object' &&
+        'reason' in payload.error.details[0]
+          ? String((payload.error.details[0] as { reason?: string }).reason ?? '')
+          : '';
+      if (!tokenFromBody && rejectReason === 'refreshReuse') {
+        logAuthEvent({
+          event: 'auth.refresh',
+          request,
+          outcome: 'upstream_error',
+          portal: 'client',
+          upstreamStatus: gatewayRes.status,
+          serviceFallback: SERVICE,
+          code: 'AUTH_REFRESH_BUSY',
+        });
+        return transientUpstreamResponse(2);
+      }
       logAuthEvent({
         event: 'auth.refresh',
         request,
@@ -203,6 +225,18 @@ async function postHandler(request: Request) {
       serviceFallback: SERVICE,
     });
     return tokenFromBody ? unauthorizedRefreshResponse() : noSessionResponse();
+  }
+
+  // NL-BV-W7-03: same portal gate as login/verify-2fa — never mint client cookies for ADMIN.
+  const portalMismatch = portalRoleMismatchResponse(
+    request,
+    'client',
+    roleFromAccessToken(tokens.accessToken),
+    SERVICE
+  );
+  if (portalMismatch) {
+    clearHttpOnlyAuthCookies(portalMismatch);
+    return portalMismatch;
   }
 
   logAuthEvent({

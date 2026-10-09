@@ -84,7 +84,7 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = HARD_ABSENT_REWRITE;
     const rewritten = NextResponse.rewrite(url);
-    response.cookies.getAll().forEach((cookie) => {
+    response.cookies.getAll().forEach((cookie: { name: string; value: string }) => {
       rewritten.cookies.set(cookie.name, cookie.value);
     });
     return withRequestLog(withCspNonce(rewritten, request), request, 'nl-prod-frontend-admin');

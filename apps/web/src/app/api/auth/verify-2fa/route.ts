@@ -7,6 +7,8 @@ import {
   gatewayErrorStatus,
   getGatewayOrigin,
   logAuthEvent,
+  normalizeUserRole,
+  portalRoleMismatchResponse,
   type GatewayAuthTokens,
 } from '@nestlancer/auth';
 import {
@@ -114,6 +116,15 @@ async function postHandler(request: Request) {
     });
     return NextResponse.json({ message: 'Invalid verification response' }, { status: 502 });
   }
+
+  // NL-BV-F1-01: same portal gate as login — 2FA must not mint client cookies for ADMIN.
+  const portalMismatch = portalRoleMismatchResponse(
+    request,
+    'client',
+    normalizeUserRole(data.user),
+    SERVICE
+  );
+  if (portalMismatch) return portalMismatch;
 
   logAuthEvent({
     event: 'auth.verify_2fa',

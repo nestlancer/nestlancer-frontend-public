@@ -54,16 +54,15 @@ const nextConfig = {
      * `/` stays on the app host as the portal entry (`/login`) — do not bounce to apex
      * (NL-HOST-001). Marketing pages still canonicalize to the landing/apex host.
      */
+    // `/` → `/login` is handled in middleware so the 307 carries production CSP.
     const toLanding = landing
       ? [
-          { source: '/', destination: '/login', permanent: false },
           { source: '/about', destination: `${landing}/about`, permanent: false },
           { source: '/pricing', destination: `${landing}/pricing`, permanent: false },
           { source: '/services', destination: `${landing}/services`, permanent: false },
           { source: '/how-it-works', destination: `${landing}/#how-it-works`, permanent: false },
         ]
       : [
-          { source: '/', destination: '/login', permanent: false },
           { source: '/how-it-works', destination: '/login', permanent: false },
           { source: '/pricing', destination: '/login', permanent: false },
           { source: '/services', destination: '/portfolio', permanent: false },

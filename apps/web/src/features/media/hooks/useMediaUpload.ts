@@ -12,7 +12,12 @@ import {
 
 import { apiServices } from '@/lib/axios';
 
-export function useMediaUpload(options?: { onSuccess?: (result: UploadMediaFileResult) => void }) {
+export function useMediaUpload(options?: {
+  onSuccess?: (result: UploadMediaFileResult) => void;
+  /** When false, skip the default success toast (e.g. messaging still needs a send POST). */
+  successToast?: boolean;
+}) {
+  const showSuccessToast = options?.successToast !== false;
   const mutation = useMutation({
     mutationFn: async ({
       file,
@@ -26,10 +31,13 @@ export function useMediaUpload(options?: { onSuccess?: (result: UploadMediaFileR
       threadId?: string;
     }) => uploadMediaFile(apiServices.media, file, { onProgress, projectId, threadId }),
     onSuccess: (result) => {
-      toast.success('File uploaded');
+      if (showSuccessToast) toast.success('File uploaded');
       options?.onSuccess?.(result);
     },
-    onError: (e) => toast.error(getApiErrorMessage(e, 'Upload failed')),
+    // When successToast is suppressed, caller owns all toasts (upload + follow-up send).
+    onError: (e) => {
+      if (showSuccessToast) toast.error(getApiErrorMessage(e, 'Upload failed'));
+    },
   });
 
   return {

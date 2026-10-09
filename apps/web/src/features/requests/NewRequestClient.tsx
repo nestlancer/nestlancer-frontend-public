@@ -20,7 +20,7 @@ import { Button, PageHeader, cn } from '@nestlancer/ui';
 
 import { WebPanel } from '@/components/web/WebPanel';
 import { useCreateRequestMutation } from '@/features/requests/hooks/useRequestsApi';
-import { webPrimaryButtonClass } from '@/lib/tailadmin-classes';
+import { webPrimaryButtonClass, webStickyActionBarClass } from '@/lib/tailadmin-classes';
 
 const CATEGORIES = [
   'webDevelopment',
@@ -353,13 +353,22 @@ export function NewRequestClient() {
           </div>
         </WebPanel>
 
-        <div className="flex flex-wrap items-center justify-end gap-2 pt-1">
-          <Button type="button" variant="outline" asChild>
-            <Link href={routes.requests}>Cancel</Link>
-          </Button>
-          <Button type="submit" disabled={pending} className={webPrimaryButtonClass}>
-            {pending ? 'Saving…' : 'Save draft'}
-          </Button>
+        <div className="h-20" aria-hidden />
+        <div
+          className={cn(
+            webStickyActionBarClass,
+            'lg:left-[var(--sidebar-width,16rem)]',
+            'pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+          )}
+        >
+          <div className="mx-auto flex max-w-2xl flex-wrap items-center justify-end gap-2">
+            <Button type="button" variant="outline" asChild>
+              <Link href={routes.requests}>Cancel</Link>
+            </Button>
+            <Button type="submit" disabled={pending} className={webPrimaryButtonClass}>
+              {pending ? 'Saving…' : 'Save draft'}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

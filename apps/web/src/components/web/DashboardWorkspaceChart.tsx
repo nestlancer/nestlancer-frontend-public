@@ -67,7 +67,7 @@ export function DashboardWorkspaceChart({
     { label: 'Active', value: projectsActive, tone: 'bg-ta-brand-500' },
     { label: 'Done', value: projectsCompleted, tone: 'bg-sky-400' },
     { label: 'Requests', value: openRequests, tone: 'bg-amber-400' },
-    { label: 'Quotes', value: pendingQuotes, tone: 'bg-violet-400' },
+    { label: 'Quotes', value: pendingQuotes, tone: 'bg-slate-400' },
   ];
   const maxPipe = Math.max(1, ...pipeline.map((p) => p.value));
 
@@ -81,7 +81,7 @@ export function DashboardWorkspaceChart({
       )}
     >
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(ellipse_at_top,rgba(20,184,166,0.12),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(45,212,191,0.14),transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.08),transparent_70%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.1),transparent_70%)]"
         aria-hidden
       />
       <div className="relative mb-3 flex items-end justify-between gap-2">
@@ -95,7 +95,7 @@ export function DashboardWorkspaceChart({
         </div>
       </div>
 
-      <div className={cn('relative', compact ? 'space-y-2' : 'space-y-4')}>
+      <div className={cn('relative', compact ? 'space-y-2' : 'space-y-3')}>
         {pipeline.map((row) => {
           const pct = Math.round((row.value / maxPipe) * 100);
           return (
@@ -103,10 +103,10 @@ export function DashboardWorkspaceChart({
               <p className="w-16 shrink-0 text-xs font-medium text-gray-700 dark:text-white/80">
                 {row.label}
               </p>
-              <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+              <div className="h-1 min-w-0 flex-1 overflow-hidden rounded-sm bg-gray-100/70 dark:bg-gray-800/60">
                 <div
                   className={cn(
-                    'h-full rounded-full transition-all duration-700',
+                    'h-full rounded-sm transition-all duration-700',
                     row.tone,
                     pipeWidthClass(row.value > 0 ? Math.max(pct, 8) : 0)
                   )}
@@ -120,31 +120,36 @@ export function DashboardWorkspaceChart({
         })}
       </div>
 
-      <div className={cn('relative grid gap-2 sm:grid-cols-2', compact ? 'mt-3' : 'mt-6')}>
-        <div className="rounded-lg border border-gray-200/80 bg-gray-50/80 px-3 py-2.5 dark:border-gray-700 dark:bg-white/[0.03]">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-500">
+      <div
+        className={cn(
+          'relative grid gap-0 divide-y divide-gray-100 border-t border-gray-100 dark:divide-gray-800 dark:border-gray-800/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0',
+          compact ? 'mt-3 pt-3' : 'mt-5 pt-4'
+        )}
+      >
+        <div className="pe-0 sm:pe-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             Collected
           </p>
           <p
             className={cn(
-              'mt-0.5 text-base font-bold tabular-nums tracking-tight',
+              'mt-0.5 text-sm font-bold tabular-nums tracking-tight',
               webPrimaryTextClass
             )}
           >
             {formatMoneyFromPaise(totalSpent, 'INR', 'en-IN')}
           </p>
         </div>
-        <div className="rounded-lg border border-amber-200/70 bg-amber-50/70 px-3 py-2.5 dark:border-amber-500/30 dark:bg-amber-500/10">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-800/80 dark:text-amber-200/80">
+        <div className="ps-0 pt-3 sm:ps-4 sm:pt-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-600 dark:text-amber-400">
             Pending
           </p>
-          <p className="mt-0.5 text-base font-bold tabular-nums tracking-tight text-amber-900 dark:text-amber-100">
+          <p className="mt-0.5 text-sm font-bold tabular-nums tracking-tight text-amber-700 dark:text-amber-300">
             {formatMoneyFromPaise(pendingPayments, 'INR', 'en-IN')}
           </p>
           {pendingPayments > 0 && payHref ? (
             <Link
               href={payHref}
-              className="mt-1 inline-block text-[11px] font-semibold text-amber-800 underline-offset-2 hover:underline dark:text-amber-200"
+              className="mt-0.5 inline-block text-[11px] font-medium text-amber-600 underline-offset-2 hover:underline dark:text-amber-400"
             >
               Complete checkout →
             </Link>

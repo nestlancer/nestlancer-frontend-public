@@ -155,10 +155,11 @@ export function InvoicesListClient() {
                               type="button"
                               variant="ghost"
                               size="sm"
+                              aria-label={`Download invoice ${invoiceLabel(row)}`}
                               onClick={() => void downloadInvoice(row.id)}
                             >
                               <Download className="h-4 w-4" aria-hidden />
-                              PDF
+                              Download invoice
                             </Button>
                           ) : null}
                           <Button type="button" variant="ghost" size="sm" asChild>

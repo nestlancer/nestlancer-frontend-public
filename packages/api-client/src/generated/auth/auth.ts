@@ -206,6 +206,13 @@ export const getAuth = () => {
       data: verifyEmailDto,
     });
   };
+  /**
+   * Client-portal support sessions call this on Stop and return so the server grant ends without relying on the admin tab.
+   * @summary End own impersonation session
+   */
+  const authControllerEndOwnImpersonation = () => {
+    return customInstance<void>({ url: `/api/v1/auth/end-impersonation`, method: 'POST' });
+  };
   return {
     authAuthPublicControllerCheckEmail,
     authAuthPublicControllerCheckEmailPost,
@@ -220,6 +227,7 @@ export const getAuth = () => {
     authAuthPublicControllerResetPassword,
     authAuthPublicControllerVerify2fa,
     authAuthPublicControllerVerifyEmail,
+    authControllerEndOwnImpersonation,
   };
 };
 export type AuthAuthPublicControllerCheckEmailResult = NonNullable<
@@ -260,4 +268,7 @@ export type AuthAuthPublicControllerVerify2faResult = NonNullable<
 >;
 export type AuthAuthPublicControllerVerifyEmailResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getAuth>['authAuthPublicControllerVerifyEmail']>>
+>;
+export type AuthControllerEndOwnImpersonationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getAuth>['authControllerEndOwnImpersonation']>>
 >;

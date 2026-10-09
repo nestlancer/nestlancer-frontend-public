@@ -45,6 +45,7 @@ export const adminKeys = {
   webhooks: () => [...adminKeys.root, 'webhooks'] as const,
   webhookMeta: () => [...adminKeys.root, 'webhooks', 'meta'] as const,
   auditLogs: () => [...adminKeys.root, 'logs'] as const,
+  systemAuditLogs: () => [...adminKeys.root, 'audit', 'system'] as const,
   securityStats: () => [...adminKeys.root, 'logs', 'security-stats'] as const,
   usersLogs: () => [...adminKeys.root, 'users', 'logs'] as const,
   portfolio: () => [...adminKeys.root, 'portfolio'] as const,

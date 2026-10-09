@@ -77,7 +77,7 @@ export function ClientDockChatWindow({
   const [text, setText] = useState('');
   const [quickOpen, setQuickOpen] = useState(false);
   const quickRef = useRef<HTMLDivElement>(null);
-  const { uploadAsync, isUploading } = useMediaUpload();
+  const { uploadAsync, isUploading } = useMediaUpload({ successToast: false });
   const [accessToken, setAccessToken] = useState<string | undefined>(
     () => getAccessToken() ?? undefined
   );
@@ -413,27 +413,32 @@ export function ClientDockChatWindow({
                 enableFileAttach
                 fileSendPending={isUploading}
                 onSendFile={async (file, caption) => {
-                  const result = await uploadAsync({
-                    file,
-                    projectId: projectId || undefined,
-                    threadId: threadId || undefined,
-                  });
-                  if (threadId) {
-                    await apiServices.messaging.sendChatThreadMessage(threadId, {
-                      mediaId: result.mediaId,
-                      type: 'FILE',
-                      ...(caption ? { content: caption } : {}),
+                  try {
+                    const result = await uploadAsync({
+                      file,
+                      projectId: projectId || undefined,
+                      threadId: threadId || undefined,
                     });
-                  } else if (projectId) {
-                    await apiServices.messaging.sendProjectMessage(projectId, {
-                      mediaId: result.mediaId,
-                      type: 'FILE',
-                      ...(caption ? { content: caption } : {}),
-                    });
-                  } else {
-                    throw new Error('Missing message context');
+                    if (threadId) {
+                      await apiServices.messaging.sendChatThreadMessage(threadId, {
+                        mediaId: result.mediaId,
+                        type: 'FILE',
+                        ...(caption ? { content: caption } : {}),
+                      });
+                    } else if (projectId) {
+                      await apiServices.messaging.sendProjectMessage(projectId, {
+                        mediaId: result.mediaId,
+                        type: 'FILE',
+                        ...(caption ? { content: caption } : {}),
+                      });
+                    } else {
+                      throw new Error('Missing message context');
+                    }
+                    invalidateFromRealtime();
+                    toast.success('File sent');
+                  } catch (e) {
+                    toast.error(getApiErrorMessage(e, 'Could not send file'));
                   }
-                  invalidateFromRealtime();
                 }}
                 leadingSlot={
                   <button

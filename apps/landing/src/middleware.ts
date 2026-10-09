@@ -6,7 +6,17 @@ import type { NextRequest } from 'next/server';
 import { resolveWebAppOriginFromHost } from '@/lib/site-origin';
 
 /** Paths that live on the client portal (app.*), not the marketing site. */
-const WEB_APP_PATHS = ['/blog', '/portfolio', '/terms', '/privacy'] as const;
+const WEB_APP_PATHS = [
+  '/blog',
+  '/portfolio',
+  '/terms',
+  '/privacy',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+] as const;
 
 function matchesWebAppPath(pathname: string): string | null {
   for (const prefix of WEB_APP_PATHS) {
@@ -42,5 +52,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  // Skip static assets and machine-readable SEO/text routes (no HTML CSP needed).
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|sitemap\\.xml|robots\\.txt|llms\\.txt|llms-full\\.txt|\\.well-known/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };

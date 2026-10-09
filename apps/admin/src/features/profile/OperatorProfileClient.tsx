@@ -12,6 +12,8 @@ import {
   GePageHeader as PageHeader,
 } from '@/components/admin/AdminGentelellaUI';
 
+import { OperatorTwoFactorSection } from './OperatorTwoFactorSection';
+
 export function OperatorProfileClient() {
   const { user } = useAuth();
 
@@ -71,6 +73,8 @@ export function OperatorProfileClient() {
               </div>
             </div>
           </GeCard>
+
+          <OperatorTwoFactorSection />
 
           <GeCard>
             <div className="ge-card-body space-y-2 text-sm text-muted-foreground">

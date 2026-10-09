@@ -26,11 +26,24 @@ export function usePaymentDocumentVersionsQuery(paymentId: string, enabled = tru
   });
 }
 
+/** FNV-1a fingerprint so verify cache keys bust on token change without storing the secret. */
+function tokenFingerprint(token: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < token.length; i++) {
+    h ^= token.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16);
+}
+
 export function useDocumentVerifyQuery(documentNumber: string, token?: string, enabled = true) {
   const trimmed = documentNumber.trim();
   const trimmedToken = token?.trim() ?? '';
   return useQuery({
-    queryKey: queryKeys.documents.verify(trimmed, trimmedToken || undefined),
+    queryKey: queryKeys.documents.verify(
+      trimmed,
+      trimmedToken ? tokenFingerprint(trimmedToken) : ''
+    ),
     queryFn: () => apiServices.documents.verify(trimmed, trimmedToken || undefined),
     // Public verify requires HMAC `t` after E-10; number-only always 404s.
     enabled: Boolean(trimmed) && Boolean(trimmedToken) && enabled,

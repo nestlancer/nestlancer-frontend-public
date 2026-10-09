@@ -17,7 +17,11 @@ import { ArrowLeft } from '@nestlancer/ui/icons';
 import { FormFieldLabel } from '@nestlancer/field-help';
 import { apiServices } from '@/lib/axios';
 import { coerceAuthUser } from '@/lib/auth-user';
-import { webPrimaryButtonClass, webSectionClass } from '@/lib/tailadmin-classes';
+import {
+  webPrimaryButtonClass,
+  webSectionClass,
+  webStickyActionBarClass,
+} from '@/lib/tailadmin-classes';
 
 function normalizePhoneForStorage(value: string): string | undefined {
   const trimmed = value.trim();
@@ -299,13 +303,24 @@ export function ProfileEditClient() {
           </div>
         </div>
 
-        <Button
-          type="submit"
-          className={cn('h-12 w-full rounded-xl text-base font-semibold', webPrimaryButtonClass)}
-          disabled={save.isPending}
+        <div className="h-16" aria-hidden />
+        <div
+          className={cn(
+            webStickyActionBarClass,
+            'lg:left-[var(--sidebar-width,16rem)]',
+            'pb-[max(0.75rem,env(safe-area-inset-bottom))]'
+          )}
         >
-          Save changes
-        </Button>
+          <div className="mx-auto flex max-w-dashboard justify-end">
+            <Button
+              type="submit"
+              className={cn('h-10 rounded-lg px-5 font-semibold', webPrimaryButtonClass)}
+              disabled={save.isPending}
+            >
+              {save.isPending ? 'Saving…' : 'Save changes'}
+            </Button>
+          </div>
+        </div>
       </form>
     </div>
   );

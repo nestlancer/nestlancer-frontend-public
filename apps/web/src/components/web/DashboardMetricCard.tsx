@@ -18,6 +18,11 @@ type DashboardMetricCardProps = {
   featured?: boolean;
   /** Tighter padding for denser dashboards. */
   compact?: boolean;
+  /**
+   * Cell inside `webMetricStripClass` — flat, no icon circle, no hover lift.
+   * Prefer this on Overview vitals (2026 strip, not card soup).
+   */
+  strip?: boolean;
 };
 
 export function DashboardMetricCard({
@@ -30,7 +35,49 @@ export function DashboardMetricCard({
   className,
   featured,
   compact,
+  strip,
 }: DashboardMetricCardProps) {
+  if (strip) {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          'group flex h-full min-w-0 flex-col justify-center px-3.5 py-2.5 transition-colors',
+          'hover:bg-ta-brand-50/40 dark:hover:bg-ta-brand-500/[0.06]',
+          className
+        )}
+      >
+        <div className="flex items-center gap-1.5">
+          <span
+            className="text-gray-400 dark:text-gray-500 [&_svg]:h-3.5 [&_svg]:w-3.5"
+            aria-hidden
+          >
+            {icon}
+          </span>
+          <span className="truncate text-[11px] font-medium text-gray-500 dark:text-gray-400">
+            {label}
+          </span>
+          <ArrowRight
+            className="ml-auto h-3 w-3 shrink-0 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100 dark:text-gray-600"
+            aria-hidden
+          />
+        </div>
+        <p
+          className={cn(
+            'mt-1 font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white/90',
+            'text-lg sm:text-xl',
+            value === '…' && 'animate-pulse'
+          )}
+        >
+          {value}
+        </p>
+        {hint ? (
+          <p className="mt-0.5 truncate text-[11px] text-gray-500 dark:text-gray-400">{hint}</p>
+        ) : null}
+      </Link>
+    );
+  }
+
   return (
     <Link href={href} className="group block h-full">
       <div
@@ -38,16 +85,15 @@ export function DashboardMetricCard({
           webPanelClass,
           'relative h-full overflow-hidden transition-theme',
           compact ? 'p-3.5 md:p-4' : 'p-5 md:p-6',
-          'group-hover:-translate-y-0.5 group-hover:border-ta-brand-500/45 group-hover:shadow-md',
-          featured &&
-            'bg-[radial-gradient(ellipse_at_top_right,rgba(20,184,166,0.14),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_top_right,rgba(45,212,191,0.16),transparent_55%)]',
+          'group-hover:border-ta-brand-500/45 group-hover:shadow-md',
+          featured && 'border-ta-brand-500/30 bg-ta-brand-50/40 dark:bg-ta-brand-500/[0.08]',
           className
         )}
       >
         <div className="flex items-start justify-between gap-2">
           <div
             className={cn(
-              'flex items-center justify-center rounded-xl bg-ta-brand-50 text-ta-brand-600 ring-1 ring-ta-brand-500/15',
+              'flex items-center justify-center rounded-lg bg-ta-brand-50 text-ta-brand-600 ring-1 ring-ta-brand-500/15',
               'dark:bg-ta-brand-500/[0.12] dark:text-ta-brand-400',
               compact ? 'h-8 w-8' : featured ? 'h-12 w-12' : 'h-11 w-11'
             )}
@@ -63,9 +109,7 @@ export function DashboardMetricCard({
           />
         </div>
         <div className={compact ? 'mt-2.5' : 'mt-5'}>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400">
-            {label}
-          </span>
+          <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{label}</span>
           <h3
             className={cn(
               'font-bold tabular-nums tracking-tight text-gray-800 dark:text-white/90',

@@ -700,7 +700,7 @@ export function AdminMediaStorageBrowser() {
                     className={cn(
                       'rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors',
                       (scope.contextType || '') === s.value
-                        ? 'bg-primary/15 text-primary'
+                        ? 'bg-primary/15 font-semibold text-foreground ring-1 ring-inset ring-primary/30'
                         : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
                     )}
                   >
@@ -1189,7 +1189,9 @@ function SidebarItem({
         onClick={onClick}
         className={cn(
           'flex flex-1 items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left transition-colors',
-          active ? 'bg-primary/10 font-medium text-primary' : 'hover:bg-muted/50'
+          active
+            ? 'bg-primary/10 font-medium text-foreground ring-1 ring-inset ring-primary/25'
+            : 'hover:bg-muted/50'
         )}
       >
         <span className="flex min-w-0 items-center gap-1.5">

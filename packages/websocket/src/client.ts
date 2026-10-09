@@ -73,7 +73,8 @@ export function getSocket(url: string, token?: string, options?: GetSocketOption
       'X-Correlation-ID': correlationId,
       'X-Request-ID': correlationId,
     },
-    withCredentials: true,
+    // Bearer auth only — do not send HttpOnly refresh cookies to WS gateway (NL-BV-C1-04).
+    withCredentials: false,
   });
 
   return socket;
